@@ -1,0 +1,30 @@
+# JetBrains / IDE
+/.idea/
+*.iml
+/.vscode/
+
+# Composer
+/vendor/
+/auth.json
+
+# Yii runtime
+/runtime/
+/web/assets/
+/tests/_output/
+
+# Local environment
+/.env
+/.env.local
+/.env.docker
+/docker-compose.override.yml
+
+# Uploaded files
+/web/uploads/*
+!/web/uploads/.gitkeep
+
+# Local logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
