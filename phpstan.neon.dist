@@ -1,0 +1,17 @@
+parameters:
+    bootstrapFiles:
+        - vendor/yiisoft/yii2/Yii.php
+    dynamicConstantNames:
+        - YII_DEBUG
+        - YII_ENV
+        - YII_ENV_DEV
+        - YII_ENV_PROD
+        - YII_ENV_TEST
+    paths:
+        - assets
+        - commands
+        - controllers
+        - models
+        - widgets
+    level: 5
+    tmpDir: %currentWorkingDirectory%/runtime/cache/phpstan
