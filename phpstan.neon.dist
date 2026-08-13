@@ -12,6 +12,7 @@ parameters:
         - commands
         - controllers
         - models
+        - services
         - widgets
     level: 5
     tmpDir: %currentWorkingDirectory%/runtime/cache/phpstan

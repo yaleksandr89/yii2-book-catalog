@@ -11,5 +11,6 @@ $config['components']['assetManager'] = [
     'basePath' => '@app/runtime/test-assets',
     'baseUrl' => '/assets',
 ];
+$config['params']['bookImageStorageRoot'] = '@runtime/test-book-uploads';
 
 return $config;

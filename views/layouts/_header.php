@@ -14,6 +14,10 @@ $items = [
         'url' => ['/site/index'],
     ],
     [
+        'label' => 'Книги',
+        'url' => ['/book/index'],
+    ],
+    [
         'label' => 'Авторы',
         'url' => ['/author/index'],
     ],

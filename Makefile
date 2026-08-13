@@ -82,7 +82,7 @@ init:
 	else \
 		printf '%s\n' 'Existing .env.docker left unchanged.'; \
 	fi
-	@mkdir -p runtime/cache web/assets
+	@mkdir -p runtime/cache web/assets web/uploads/books
 
 cookie-key: check-env
 	@$(COMPOSE) run --rm --no-deps --user app php php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
@@ -175,7 +175,7 @@ composer-validate: check-env
 	@$(COMPOSE) exec --user app php composer validate
 
 php-lint: check-env
-	@$(COMPOSE) exec --user app php bash -lc 'find assets commands controllers models widgets config views -type f -name "*.php" -print0 | xargs -0 -n1 php -l'
+	@$(COMPOSE) exec --user app php bash -lc 'find assets commands controllers models services widgets config views -type f -name "*.php" -print0 | xargs -0 -n1 php -l'
 
 phpstan-check: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=-1
