@@ -2,6 +2,8 @@ PROJECT := yii2-book-catalog
 ENV_FILE := .env.docker
 COMPOSE := docker compose -p $(PROJECT) --env-file $(ENV_FILE)
 CMD ?=
+-include $(ENV_FILE)
+MYSQL_TEST_DATABASE ?= yii2_book_catalog_test
 SERVICES := php nginx mysql
 SERVICE_TARGETS := restart log in
 SERVICE_TARGET := $(firstword $(filter $(SERVICE_TARGETS),$(MAKECMDGOALS)))
@@ -27,7 +29,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate check composer-validate php-lint phpstan-check phpcs-check
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate test-db-init test-db-migrate test mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -57,12 +59,20 @@ help:
 	@printf '%s\n' '  make composer-install                  Install locked Composer dependencies / Установить Composer-зависимости из lock-файла'
 	@printf '%s\n' '  make migrate                           Run Yii database migrations / Применить миграции Yii'
 	@printf '%s\n' ''
+	@printf '%s\n' 'Tests / Тесты:'
+	@printf '%s\n' '  make test-db-init                      Create the isolated MySQL test database / Создать изолированную тестовую БД MySQL'
+	@printf '%s\n' '  make test-db-migrate                   Apply migrations to the test database / Применить миграции в тестовую БД'
+	@printf '%s\n' '  make test                              Run PHPUnit against the test database / Запустить PHPUnit на тестовой БД'
+	@printf '%s\n' ''
 	@printf '%s\n' 'Quality / Качество:'
 	@printf '%s\n' '  make check                             Run all configured read-only quality checks / Запустить все настроенные проверки качества без изменения файлов'
 	@printf '%s\n' '  make composer-validate                 Validate Composer files / Проверить Composer-файлы'
 	@printf '%s\n' '  make php-lint                          Lint first-party PHP files / Проверить синтаксис PHP-файлов проекта'
 	@printf '%s\n' '  make phpstan-check                     Run PHPStan read-only analysis / Запустить PHPStan-анализ без изменения файлов'
 	@printf '%s\n' '  make phpcs-check                       Run Yii2 PHPCS coding-standard check / Проверить код стандартами Yii2 через PHPCS'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Destructive maintenance / Деструктивные операции:'
+	@printf '%s\n' '  make mysql-reinit CONFIRM=mysql-data   Recreate MySQL volume and dev/test schemas / Пересоздать MySQL volume и dev/test схемы'
 	@printf '%s\n' ''
 
 init:
@@ -137,6 +147,29 @@ composer-install: check-env
 
 migrate: check-env
 	@$(COMPOSE) exec --user app php ./yii migrate --interactive=0
+
+test-db-init: check-env
+	@test -n "$(MYSQL_TEST_DATABASE)" || (echo 'MYSQL_TEST_DATABASE must be set in .env.docker.' >&2; exit 1)
+	@$(COMPOSE) exec -e MYSQL_TEST_DATABASE=$(MYSQL_TEST_DATABASE) mysql sh -lc 'mysql -uroot -p"$$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS \`$$MYSQL_TEST_DATABASE\`; GRANT ALL PRIVILEGES ON \`$$MYSQL_TEST_DATABASE\`.* TO '\''$$MYSQL_USER'\''@'\''%'\''; FLUSH PRIVILEGES;"'
+
+test-db-migrate: check-env
+	@$(COMPOSE) exec --user app \
+		-e MYSQL_DATABASE=$(MYSQL_TEST_DATABASE) \
+		php ./yii migrate --interactive=0
+
+mysql-reinit: check-env
+	@test "$(CONFIRM)" = "mysql-data" || (echo 'Usage: make mysql-reinit CONFIRM=mysql-data' >&2; exit 1)
+	@volume="$$( $(COMPOSE) volumes -q mysql )"; \
+		test -n "$$volume" || { echo 'MySQL volume not found.' >&2; exit 1; }; \
+		$(COMPOSE) down --remove-orphans; \
+		docker volume rm "$$volume"
+	@$(COMPOSE) up -d
+	@$(MAKE) migrate
+	@$(MAKE) test-db-init
+	@$(MAKE) test-db-migrate
+
+test: check-env
+	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist
 
 composer-validate: check-env
 	@$(COMPOSE) exec --user app php composer validate

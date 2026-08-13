@@ -8,10 +8,10 @@
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 
-$this->title = 'Login to your account';
+$this->title = 'Вход';
 $this->params['breadcrumbs'][] = $this->title;
-$this->params['meta_description'] = 'Log in to access your Yii2 application account.';
-$this->params['meta_keywords'] = 'yii, yii2, login, sign in, authentication';
+$this->params['meta_description'] = 'Вход в каталог книг.';
+$this->params['meta_keywords'] = 'каталог, авторы, вход';
 $htmlIcon = <<<HTML
 {label}<div class="input-group"><span class="input-group-text" aria-hidden="true">%s</span>{input}</div>{error}{hint}
 HTML;
@@ -36,10 +36,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     </div>
                     <div>
                         <h2 class="fw-bold mb-3 login-brand-title">
-                            Welcome<br>Back
+                            С возвращением
                         </h2>
                         <p class="opacity-75 mb-0 login-brand-text">
-                            Log in to access your Yii2 application and manage your account.
+                            Войдите, чтобы управлять авторами.
                         </p>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             ) ?>
                         </div>
                         <h1 class="h3 fw-bold mb-1"><?= Html::encode($this->title) ?></h1>
-                        <p class="text-body-secondary small">Enter your credentials to continue</p>
+                        <p class="text-body-secondary small">Введите учётные данные для продолжения</p>
                     </div>
 
                     <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
@@ -72,10 +72,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             'template' => sprintf($htmlIcon, '&#128100;'),
                             'inputOptions' => [
                                 'class' => 'form-control',
-                                'placeholder' => 'username',
+                                'placeholder' => 'Имя пользователя',
                                 'autofocus' => true,
                             ],
-                        ])->textInput()->label('Your Username', $labelOptions) ?>
+                        ])->textInput()->label('Имя пользователя', $labelOptions) ?>
                     </div>
 
                     <div class="mb-3">
@@ -84,9 +84,9 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             'template' => sprintf($htmlIcon, '&#128274;'),
                             'inputOptions' => [
                                 'class' => 'form-control',
-                                'placeholder' => 'Password',
+                                'placeholder' => 'Пароль',
                             ],
-                        ])->passwordInput()->label('Your Password', $labelOptions) ?>
+                        ])->passwordInput()->label('Пароль', $labelOptions) ?>
                     </div>
 
                     <div class="mb-4">
@@ -95,7 +95,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
 
                     <div class="d-grid">
                         <?= Html::submitButton(
-                            'Login',
+                            'Войти',
                             [
                                 'class' => 'btn login-btn btn-lg rounded-3 text-white',
                                 'name' => 'login-button',
@@ -104,12 +104,6 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     </div>
 
                     <?php ActiveForm::end(); ?>
-
-                    <div class="text-body-secondary text-center mt-3 small">
-                        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-                        To modify the username/password, check <code>app\models\User::$users</code>.
-                    </div>
-
                 </div>
             </div>
 

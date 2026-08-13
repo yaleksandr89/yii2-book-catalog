@@ -7,6 +7,8 @@ services:
         APP_UID: ${HOST_UID}
         APP_GID: ${HOST_GID}
     env_file: .env.docker
+    environment:
+      PHP_IDE_CONFIG: serverName=yii2-book-catalog
     volumes:
       - ./:/var/www/html
       - composer-home:/home/app/.composer
@@ -19,7 +21,7 @@ services:
   nginx:
     image: nginx:stable
     ports:
-      - "${APP_PORT}:80"
+      - "127.0.0.1:${APP_PORT}:80"
     volumes:
       - ./:/var/www/html:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
@@ -28,6 +30,8 @@ services:
 
   mysql:
     image: mysql:8.4
+    ports:
+      - "127.0.0.1:${DB_FORWARD_PORT}:3306"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}

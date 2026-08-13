@@ -4,10 +4,12 @@
     <arg name="colors"/>
     <rule ref="vendor/yiisoft/yii2-coding-standards/Yii2/ruleset.xml"/>
     <exclude-pattern>config/__autocomplete.php</exclude-pattern>
+    <exclude-pattern>tests/bootstrap.php</exclude-pattern>
     <file>assets</file>
     <file>commands</file>
     <file>config</file>
     <file>controllers</file>
     <file>models</file>
+    <file>tests</file>
     <file>widgets</file>
 </ruleset>

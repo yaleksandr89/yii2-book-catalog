@@ -10,24 +10,20 @@ use yii\helpers\Html;
 
 $items = [
     [
-        'label' => 'Home',
+        'label' => 'Главная',
         'url' => ['/site/index'],
     ],
     [
-        'label' => 'About',
-        'url' => ['/site/about'],
+        'label' => 'Авторы',
+        'url' => ['/author/index'],
     ],
     [
-        'label' => 'Contact',
-        'url' => ['/site/contact'],
-    ],
-    [
-        'label' => 'Login',
+        'label' => 'Войти',
         'url' => ['/site/login'],
         'visible' => Yii::$app->user->isGuest,
     ],
     [
-        'label' => 'Logout (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
+        'label' => 'Выйти (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
         'url' => ['/site/logout'],
         'linkOptions' => [
             'data-method' => 'post',
