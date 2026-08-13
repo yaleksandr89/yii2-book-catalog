@@ -14,5 +14,6 @@ parameters:
         - models
         - services
         - widgets
+        - tests
     level: 5
     tmpDir: %currentWorkingDirectory%/runtime/cache/phpstan

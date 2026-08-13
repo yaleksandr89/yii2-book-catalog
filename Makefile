@@ -29,7 +29,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate test-db-init test-db-migrate test mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -63,6 +63,7 @@ help:
 	@printf '%s\n' '  make test-db-init                      Create the isolated MySQL test database / Создать изолированную тестовую БД MySQL'
 	@printf '%s\n' '  make test-db-migrate                   Apply migrations to the test database / Применить миграции в тестовую БД'
 	@printf '%s\n' '  make test                              Run PHPUnit against the test database / Запустить PHPUnit на тестовой БД'
+	@printf '%s\n' '  make test-dox                          Run PHPUnit with readable TestDox output / Запустить PHPUnit с читаемым TestDox-выводом'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Quality / Качество:'
 	@printf '%s\n' '  make check                             Run all configured read-only quality checks / Запустить все настроенные проверки качества без изменения файлов'
@@ -170,6 +171,9 @@ mysql-reinit: check-env
 
 test: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist
+
+test-dox: check-env
+	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --testdox
 
 composer-validate: check-env
 	@$(COMPOSE) exec --user app php composer validate

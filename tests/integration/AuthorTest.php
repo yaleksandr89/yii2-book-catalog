@@ -16,7 +16,7 @@ final class AuthorTest extends TestCase
         $author = new Author(['full_name' => 'Лев Толстой']);
 
         self::assertTrue($author->save());
-        self::assertNotNull($author->id);
+        self::assertNotNull(Author::findOne($author->id));
     }
 
     #[TestDox('Пустое имя автора отклоняется')]
