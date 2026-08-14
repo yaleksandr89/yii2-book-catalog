@@ -31,7 +31,7 @@ final class SubscriptionController extends Controller
         if ($form->load($this->request->post()) && $form->validate()) {
             $subscription = new Subscription([
                 'author_id' => $author->id,
-                'phone' => $form->phone,
+                'phone' => $form->getNormalizedPhone(),
             ]);
 
             try {

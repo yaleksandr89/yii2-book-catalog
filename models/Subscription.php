@@ -24,7 +24,7 @@ final class Subscription extends ActiveRecord
             [['author_id', 'phone'], 'required'],
             [['author_id'], 'integer'],
             [['phone'], 'string', 'max' => 15],
-            [['phone'], 'match', 'pattern' => '/^[1-9][0-9]{9,14}$/'],
+            [['phone'], 'match', 'pattern' => '/^[1-9]\d{9,14}$/'],
         ];
     }
 }

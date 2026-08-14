@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace tests\integration;
+namespace Tests\Integration;
 
 use app\models\Author;
 use app\models\Subscription;
 use app\models\SubscriptionForm;
 use PHPUnit\Framework\Attributes\TestDox;
-use tests\TestCase;
+use Tests\TestCase;
 
 final class SubscriptionTest extends TestCase
 {
@@ -19,11 +19,13 @@ final class SubscriptionTest extends TestCase
         $firstForm = new SubscriptionForm($author->id, ['phone' => '+1 (234) 567-89-01']);
 
         self::assertTrue($firstForm->validate());
-        self::assertSame('12345678901', $firstForm->phone);
-        self::assertTrue((new Subscription([
+        self::assertSame('+1 (234) 567-89-01', $firstForm->phone);
+        self::assertSame('12345678901', $firstForm->getNormalizedPhone());
+
+        self::assertTrue(new Subscription([
             'author_id' => $author->id,
-            'phone' => $firstForm->phone,
-        ]))->save());
+            'phone' => $firstForm->getNormalizedPhone(),
+        ])->save());
 
         $duplicateForm = new SubscriptionForm($author->id, ['phone' => '1 234 567 8901']);
 
@@ -31,12 +33,18 @@ final class SubscriptionTest extends TestCase
         self::assertNotEmpty($duplicateForm->getErrors('phone'));
     }
 
-    #[TestDox('Телефон с недопустимыми символами отклоняется')]
-    public function testInvalidPhoneIsRejected(): void
+    #[TestDox('Недопустимый телефон отклоняется без изменения пользовательского ввода')]
+    public function testInvalidPhoneIsRejectedWithoutChangingOriginalInput(): void
     {
-        $form = new SubscriptionForm($this->createAuthor('Автор')->id, ['phone' => '+1.234.567.8901']);
+        $phone = '+1.234.567.8901';
+
+        $form = new SubscriptionForm(
+            $this->createAuthor('Автор')->id,
+            ['phone' => $phone],
+        );
 
         self::assertFalse($form->validate());
+        self::assertSame($phone, $form->phone);
         self::assertNotEmpty($form->getErrors('phone'));
     }
 
@@ -49,15 +57,17 @@ final class SubscriptionTest extends TestCase
         $secondForm = new SubscriptionForm($secondAuthor->id, ['phone' => '1 234 567 8901']);
 
         self::assertTrue($firstForm->validate());
-        self::assertTrue((new Subscription([
+        self::assertTrue(new Subscription([
             'author_id' => $firstAuthor->id,
-            'phone' => $firstForm->phone,
-        ]))->save());
+            'phone' => $firstForm->getNormalizedPhone(),
+        ])->save());
+
         self::assertTrue($secondForm->validate());
-        self::assertTrue((new Subscription([
+
+        self::assertTrue(new Subscription([
             'author_id' => $secondAuthor->id,
-            'phone' => $secondForm->phone,
-        ]))->save());
+            'phone' => $secondForm->getNormalizedPhone(),
+        ])->save());
     }
 
     #[TestDox('Гость открывает форму и подписывается на конкретного автора')]

@@ -7,6 +7,7 @@ namespace app\commands;
 use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
+use app\models\User;
 use app\services\BookService;
 use Throwable;
 use Yii;
@@ -25,7 +26,7 @@ final class DemoDataController extends Controller
     {
         $covers = [];
         for ($number = 1; $number <= 4; $number++) {
-            $path = Yii::getAlias("@runtime/demo-covers/cover-{$number}.jpg");
+            $path = Yii::getAlias("@app/resources/demo-covers/cover-{$number}.jpg");
             if (!is_file($path) || !is_readable($path)) {
                 return null;
             }
@@ -53,7 +54,9 @@ final class DemoDataController extends Controller
     {
         $covers = $this->demoCovers();
         if ($covers === null) {
-            $this->stderr("Не найдены или недействительны JPEG-обложки: @runtime/demo-covers/cover-1.jpg, @runtime/demo-covers/cover-2.jpg, @runtime/demo-covers/cover-3.jpg, @runtime/demo-covers/cover-4.jpg.\n");
+            $this->stderr(
+                "Не найдены или недействительны JPEG-обложки в resources/demo-covers.\n",
+            );
 
             return ExitCode::DATAERR;
         }
@@ -70,10 +73,26 @@ final class DemoDataController extends Controller
         $storageRoot = Yii::getAlias((string) Yii::$app->params['bookImageStorageRoot']);
         $service = new BookService($storageRoot);
 
+        if (User::findByUsername('admin') !== null) {
+            $this->stderr("Пользователь admin уже существует.\n");
+
+            return ExitCode::DATAERR;
+        }
+
         $createdImages = [];
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
+            $user = new User([
+                'username' => 'admin',
+                'password_hash' => Yii::$app->security->generatePasswordHash('admin'),
+                'auth_key' => Yii::$app->security->generateRandomString(),
+            ]);
+
+            if (!$user->save()) {
+                throw new \RuntimeException('Не удалось создать демо-пользователя.');
+            }
+
             $authorIds = [];
             for ($number = 1; $number <= 12; $number++) {
                 $author = new Author(['full_name' => sprintf('Демо Автор %02d', $number)]);
@@ -99,7 +118,7 @@ final class DemoDataController extends Controller
                     'description' => self::DESCRIPTION,
                     'isbn' => sprintf('978-5-00-%06d-%d', $index + 1, $index % 10),
                     'authorIds' => array_map(
-                        static fn (int $authorIndex): int => $authorIds[$authorIndex],
+                        static fn(int $authorIndex): int => $authorIds[$authorIndex],
                         array_values(array_unique($authorIndexes)),
                     ),
                     'image' => $covers[$index % 4],
@@ -122,7 +141,7 @@ final class DemoDataController extends Controller
             return ExitCode::DATAERR;
         }
 
-        $this->stdout("Demo data created: 12 authors, 30 books.\n");
+        $this->stdout("Demo data created: admin/admin, 12 authors, 30 books.\n");
 
         return ExitCode::OK;
     }

@@ -21,7 +21,13 @@ $this->params['breadcrumbs'] = [
     <p>Оставьте телефон, чтобы подписаться на автора «<?= Html::encode($author->full_name) ?>».</p>
 
     <?php $activeForm = ActiveForm::begin() ?>
-        <?= $activeForm->field($form, 'phone')->textInput(['autocomplete' => 'tel', 'inputmode' => 'tel']) ?>
+    <?= $activeForm
+        ->field($form, 'phone', ['enableClientValidation' => false])
+        ->textInput([
+            'autocomplete' => 'tel',
+            'inputmode' => 'tel',
+            'placeholder' => '+1 (234) 567-89-01',
+        ]) ?>
         <?= Html::submitButton('Подписаться', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end() ?>
 </div>

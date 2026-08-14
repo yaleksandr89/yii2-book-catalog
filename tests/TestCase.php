@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace Tests;
 
 use Yii;
 use yii\helpers\FileHelper;

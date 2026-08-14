@@ -171,7 +171,7 @@ mysql-reinit: check-env
 		test -n "$$volume" || { echo 'MySQL volume not found.' >&2; exit 1; }; \
 		$(COMPOSE) down --remove-orphans; \
 		docker volume rm "$$volume"
-	@$(COMPOSE) up -d
+	@$(COMPOSE) up -d --wait
 	@$(MAKE) migrate
 	@$(MAKE) test-db-init
 	@$(MAKE) test-db-migrate

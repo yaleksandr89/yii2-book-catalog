@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace tests\integration;
+namespace Tests\Integration;
 
 use app\models\Author;
 use PHPUnit\Framework\Attributes\TestDox;
-use tests\TestCase;
+use Tests\TestCase;
 
 final class AuthorTest extends TestCase
 {

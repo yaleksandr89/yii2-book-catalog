@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace tests\integration;
+namespace Tests\Integration;
 
 use app\models\Author;
 use app\models\Book;
 use app\models\TopAuthorsQuery;
 use PHPUnit\Framework\Attributes\TestDox;
-use tests\TestCase;
+use Tests\TestCase;
 use Yii;
 
 final class ReportTest extends TestCase
@@ -25,7 +25,7 @@ final class ReportTest extends TestCase
         $this->createBooks($second, 2, 2024);
         $this->createBooks($excluded, 5, 2023);
 
-        $authors = (new TopAuthorsQuery())->findByYear(2024);
+        $authors = new TopAuthorsQuery()->findByYear(2024);
 
         self::assertSame([$leader->id, $second->id], array_column($authors, 'author_id'));
         self::assertSame([3, 2], array_column($authors, 'book_count'));
@@ -41,7 +41,7 @@ final class ReportTest extends TestCase
             $this->createBooks($author, 1, 2024);
         }
 
-        $authors = (new TopAuthorsQuery())->findByYear(2024);
+        $authors = new TopAuthorsQuery()->findByYear(2024);
 
         self::assertCount(10, $authors);
         self::assertSame(array_slice($authorIds, 0, 10), array_column($authors, 'author_id'));

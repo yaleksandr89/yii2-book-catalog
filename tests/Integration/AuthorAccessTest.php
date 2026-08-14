@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace tests\integration;
+namespace Tests\Integration;
 
 use app\models\Author;
 use app\models\User;
 use PHPUnit\Framework\Attributes\TestDox;
-use tests\TestCase;
+use Tests\TestCase;
 use Yii;
 use yii\web\MethodNotAllowedHttpException;
 
