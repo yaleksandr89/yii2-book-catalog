@@ -29,7 +29,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check phpcs-fix
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -74,6 +74,7 @@ help:
 	@printf '%s\n' '  make php-lint                          Lint first-party PHP files / Проверить синтаксис PHP-файлов проекта'
 	@printf '%s\n' '  make phpstan-check                     Run PHPStan read-only analysis / Запустить PHPStan-анализ без изменения файлов'
 	@printf '%s\n' '  make phpcs-check                       Run Yii2 PHPCS coding-standard check / Проверить код стандартами Yii2 через PHPCS'
+	@printf '%s\n' '  make phpcs-fix                         Auto-fix Yii2 PHPCS coding-standard violations / Автоматически исправить нарушения стандартов Yii2 через PHPCBF'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Destructive maintenance / Деструктивные операции:'
 	@printf '%s\n' '  make mysql-reinit CONFIRM=mysql-data   Recreate MySQL volume and dev/test schemas / Пересоздать MySQL volume и dev/test схемы'
@@ -192,5 +193,8 @@ phpstan-check: check-env
 
 phpcs-check: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpcs --standard=phpcs.xml.dist
+
+phpcs-fix: check-env
+	@$(COMPOSE) exec --user app php ./vendor/bin/phpcbf --standard=phpcs.xml.dist
 
 check: composer-validate php-lint phpstan-check phpcs-check
