@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use app\integrations\SmsSenderInterface;
 use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
+use app\models\Subscription;
 use app\services\BookService;
 use PHPUnit\Framework\Attributes\TestDox;
 use RuntimeException;
@@ -195,6 +197,153 @@ final class BookServiceTest extends TestCase
             [$firstAuthor->id, $secondAuthor->id],
             array_column($book->getAuthors()->orderBy(['id' => SORT_ASC])->all(), 'id'),
         );
+    }
+
+    #[TestDox('SMS-уведомление отправляется только после фиксации новой книги')]
+    public function testCreateNotifiesSubscriberAfterCommit(): void
+    {
+        [$author] = $this->createAuthors();
+        $phone = '79990000001';
+        $title = 'Книга после коммита';
+        $this->createSubscription($author, $phone);
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::once())
+            ->method('send')
+            ->willReturnCallback(static function (
+                string $actualPhone,
+                string $message,
+            ) use (
+                $author,
+                $phone,
+                $title,
+            ): void {
+                self::assertSame($phone, $actualPhone);
+                self::assertSame('Новая книга у автора: ' . $author->full_name . '.', $message);
+                self::assertNotNull(Book::find()->where(['title' => $title])->one());
+                self::assertNull(Yii::$app->db->getTransaction());
+            });
+
+        $book = $this->serviceWith($sender)->create($this->validForm([$author->id], $title));
+
+        self::assertNotNull(Book::findOne($book->id));
+    }
+
+    #[TestDox('Один телефон с подписками на двух авторов получает одно SMS')]
+    public function testCreateDeduplicatesPhoneAcrossAuthors(): void
+    {
+        [$firstAuthor, $secondAuthor] = $this->createAuthors();
+        $phone = '79990000002';
+        $this->createSubscription($firstAuthor, $phone);
+        $this->createSubscription($secondAuthor, $phone);
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::once())
+            ->method('send')
+            ->with($phone, 'Новая книга у авторов из ваших подписок.');
+
+        $this->serviceWith($sender)->create(
+            $this->validForm([$firstAuthor->id, $secondAuthor->id], 'Книга двух авторов'),
+        );
+    }
+
+    #[TestDox('Подписчик одного автора книги получает имя только этого автора')]
+    public function testCreateNamesOnlyMatchingSubscribedAuthor(): void
+    {
+        [$firstAuthor, $secondAuthor] = $this->createAuthors();
+        $phone = '79990000004';
+        $this->createSubscription($secondAuthor, $phone);
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::once())
+            ->method('send')
+            ->with($phone, 'Новая книга у автора: ' . $secondAuthor->full_name . '.');
+
+        $this->serviceWith($sender)->create(
+            $this->validForm([$firstAuthor->id, $secondAuthor->id], 'Книга двух авторов'),
+        );
+    }
+
+    #[TestDox('Все уникальные подписчики получают попытку отправки в порядке телефона')]
+    public function testCreateAttemptsAllUniqueSubscribersInPhoneOrder(): void
+    {
+        [$author] = $this->createAuthors();
+        $phones = ['79990000003', '79990000001', '79990000002'];
+        foreach ($phones as $phone) {
+            $this->createSubscription($author, $phone);
+        }
+        $actualPhones = [];
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::exactly(3))
+            ->method('send')
+            ->willReturnCallback(static function (string $phone) use (&$actualPhones): void {
+                $actualPhones[] = $phone;
+            });
+
+        $this->serviceWith($sender)->create($this->validForm([$author->id], 'Книга для трёх подписчиков'));
+
+        self::assertSame(['79990000001', '79990000002', '79990000003'], $actualPhones);
+    }
+
+    #[TestDox('Сбой SMSPilot не повреждает книгу и не останавливает следующего подписчика')]
+    public function testProviderFailurePreservesBookAndContinuesRecipients(): void
+    {
+        [$firstAuthor, $secondAuthor] = $this->createAuthors();
+        $firstPhone = '79990000001';
+        $secondPhone = '79990000002';
+        $secret = 'do-not-log-api-key';
+        $this->createSubscription($firstAuthor, $firstPhone);
+        $this->createSubscription($secondAuthor, $firstPhone);
+        $this->createSubscription($secondAuthor, $secondPhone);
+        $attemptedPhones = [];
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::exactly(2))
+            ->method('send')
+            ->willReturnCallback(
+                static function (string $phone) use (&$attemptedPhones, $firstPhone, $secret): void {
+                    $attemptedPhones[] = $phone;
+                    if ($phone === $firstPhone) {
+                        throw new RuntimeException('Injected provider failure: ' . $secret);
+                    }
+                },
+            );
+        $logger = new Logger(['flushInterval' => 0, 'traceLevel' => 0]);
+        $originalLogger = Yii::getLogger();
+        Yii::setLogger($logger);
+
+        try {
+            $book = $this->serviceWith($sender)->create(
+                $this->validForm([$firstAuthor->id, $secondAuthor->id], 'Книга при сбое провайдера'),
+            );
+        } finally {
+            Yii::setLogger($originalLogger);
+        }
+
+        self::assertNotNull(Book::findOne($book->id));
+        self::assertFileExists($this->absolutePath($book->image_path));
+        self::assertSame(
+            [$firstAuthor->id, $secondAuthor->id],
+            array_column($book->getAuthors()->orderBy(['id' => SORT_ASC])->all(), 'id'),
+        );
+        self::assertSame([$firstPhone, $secondPhone], $attemptedPhones);
+        $this->assertWarningLogged(
+            $logger,
+            'Не удалось отправить SMS-уведомление подписчику; книга уже сохранена.',
+            BookService::class . '::notifySubscribers',
+        );
+        self::assertStringNotContainsString($secret, var_export($logger->messages, true));
+    }
+
+    #[TestDox('Обновление книги не отправляет SMS подписчикам')]
+    public function testUpdateDoesNotNotifySubscribers(): void
+    {
+        [$author] = $this->createAuthors();
+        $sender = $this->createMock(SmsSenderInterface::class);
+        $sender->expects(self::never())->method('send');
+        $service = $this->serviceWith($sender);
+        $book = $service->create($this->validForm([$author->id], 'Книга до обновления'));
+        $this->createSubscription($author, '79990000004');
+
+        $service->update($book, $this->validForm([$author->id], 'Книга после обновления', false));
+
+        self::assertSame('Книга после обновления', $book->title);
     }
 
     #[TestDox('Обновление без изображения сохраняет прежний путь и файл')]
@@ -464,12 +613,29 @@ final class BookServiceTest extends TestCase
 
     private function service(): BookService
     {
-        return new BookService((string) Yii::$app->params['bookImageStorageRoot']);
+        return $this->serviceWith($this->createStub(SmsSenderInterface::class));
+    }
+
+    private function serviceWith(SmsSenderInterface $smsSender): BookService
+    {
+        return new BookService(
+            (string) Yii::$app->params['bookImageStorageRoot'],
+            $smsSender,
+        );
     }
 
     private function serviceAt(string $storageRoot): BookService
     {
-        return new BookService($storageRoot);
+        return new BookService($storageRoot, $this->createStub(SmsSenderInterface::class));
+    }
+
+    private function createSubscription(Author $author, string $phone): void
+    {
+        $subscription = new Subscription([
+            'author_id' => $author->id,
+            'phone' => $phone,
+        ]);
+        self::assertTrue($subscription->save());
     }
 
     private function createFilesystemFixture(string $name): string

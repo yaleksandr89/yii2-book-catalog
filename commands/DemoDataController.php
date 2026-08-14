@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\integrations\smspilot\SmsPilotSender;
 use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
@@ -71,7 +72,8 @@ final class DemoDataController extends Controller
         }
 
         $storageRoot = Yii::getAlias((string) Yii::$app->params['bookImageStorageRoot']);
-        $service = new BookService($storageRoot);
+        $smsSender = new SmsPilotSender((string) Yii::$app->params['smsPilotApiKey']);
+        $service = new BookService($storageRoot, $smsSender);
 
         if (User::findByUsername('admin') !== null) {
             $this->stderr("Пользователь admin уже существует.\n");

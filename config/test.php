@@ -12,5 +12,6 @@ $config['components']['assetManager'] = [
     'baseUrl' => '/assets',
 ];
 $config['params']['bookImageStorageRoot'] = '@runtime/test-book-uploads';
+$config['params']['smsPilotApiKey'] = 'test-sms-pilot-api-key';
 
 return $config;

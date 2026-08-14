@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\integrations\smspilot\SmsPilotSender;
 use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
@@ -134,7 +135,12 @@ final class BookController extends Controller
 
     private function bookService(): BookService
     {
-        return new BookService((string) Yii::$app->params['bookImageStorageRoot']);
+        $smsSender = new SmsPilotSender((string) Yii::$app->params['smsPilotApiKey']);
+
+        return new BookService(
+            (string) Yii::$app->params['bookImageStorageRoot'],
+            $smsSender,
+        );
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use app\integrations\SmsSenderInterface;
 use app\models\Book;
 use app\models\BookForm;
 use Random\RandomException;
@@ -12,6 +13,8 @@ use Throwable;
 use Yii;
 use yii\base\Exception as YiiBaseException;
 use yii\db\Exception as YiiDbException;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\helpers\FileHelper;
 
 final class BookService
@@ -20,8 +23,10 @@ final class BookService
 
     private readonly string $storageRoot;
 
-    public function __construct(string $storageRoot)
-    {
+    public function __construct(
+        string $storageRoot,
+        private readonly SmsSenderInterface $smsSender,
+    ) {
         $this->storageRoot = Yii::getAlias($storageRoot);
     }
 
@@ -48,8 +53,6 @@ final class BookService
 
             $this->syncAuthors($book, $form->getNormalizedAuthorIds());
             $transaction->commit();
-
-            return $book;
         } catch (Throwable $exception) {
             if ($transaction?->isActive) {
                 $transaction->rollBack();
@@ -58,6 +61,10 @@ final class BookService
 
             throw $exception;
         }
+
+        $this->notifySubscribers($form->getNormalizedAuthorIds());
+
+        return $book;
     }
 
     /**
@@ -152,6 +159,41 @@ final class BookService
         Yii::$app->db->createCommand()
             ->batchInsert('{{%book_author}}', ['book_id', 'author_id'], $rows)
             ->execute();
+    }
+
+    /**
+     * @param array<int> $authorIds
+     */
+    private function notifySubscribers(array $authorIds): void
+    {
+        /** @var array<int, array{phone: string, matching_author_count: string, single_author_name: string}> $recipients */
+        $recipients = new Query()
+            ->select([
+                'phone' => '[[s]].[[phone]]',
+                'matching_author_count' => new Expression('COUNT(DISTINCT [[s]].[[author_id]])'),
+                'single_author_name' => new Expression('MIN([[a]].[[full_name]])'),
+            ])
+            ->from(['s' => '{{%subscription}}'])
+            ->innerJoin(['a' => '{{%author}}'], '[[a]].[[id]] = [[s]].[[author_id]]')
+            ->where(['s.author_id' => $authorIds])
+            ->groupBy(['s.phone'])
+            ->orderBy(['s.phone' => SORT_ASC])
+            ->all();
+
+        foreach ($recipients as $recipient) {
+            $message = (int) $recipient['matching_author_count'] === 1
+                ? sprintf('Новая книга у автора: %s.', $recipient['single_author_name'])
+                : 'Новая книга у авторов из ваших подписок.';
+
+            try {
+                $this->smsSender->send($recipient['phone'], $message);
+            } catch (RuntimeException) {
+                Yii::warning(
+                    'Не удалось отправить SMS-уведомление подписчику; книга уже сохранена.',
+                    __METHOD__,
+                );
+            }
+        }
     }
 
     /**

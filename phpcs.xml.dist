@@ -26,6 +26,7 @@
     <file>commands</file>
     <file>config</file>
     <file>controllers</file>
+    <file>integrations</file>
     <file>mail</file>
     <file>migrations</file>
     <file>models</file>

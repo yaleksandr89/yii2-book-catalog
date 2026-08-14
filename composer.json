@@ -16,7 +16,8 @@
     "require": {
         "php": ">=8.4.1",
         "yiisoft/yii2": "~2.0.55",
-        "yiisoft/yii2-bootstrap5": "~2.0.2"
+        "yiisoft/yii2-bootstrap5": "~2.0.2",
+        "yiisoft/yii2-httpclient": "^2.0.17"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.0",

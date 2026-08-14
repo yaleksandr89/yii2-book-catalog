@@ -11,6 +11,7 @@ parameters:
         - assets
         - commands
         - controllers
+        - integrations
         - models
         - services
         - widgets

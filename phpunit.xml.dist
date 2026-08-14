@@ -14,6 +14,7 @@
         <include>
             <directory suffix=".php">commands</directory>
             <directory suffix=".php">controllers</directory>
+            <directory suffix=".php">integrations</directory>
             <directory suffix=".php">models</directory>
             <directory suffix=".php">services</directory>
         </include>
