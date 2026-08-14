@@ -10,6 +10,7 @@ use app\models\BookForm;
 use app\services\BookService;
 use Throwable;
 use Yii;
+use yii\data\Pagination;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -41,12 +42,18 @@ final class BookController extends Controller
 
     public function actionIndex(): string
     {
-        $books = Book::find()
+        $query = Book::find()->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC]);
+        $pagination = new Pagination([
+            'totalCount' => (int) $query->count(),
+            'pageSize' => 10,
+        ]);
+        $books = $query
             ->with('authors')
-            ->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC])
+            ->offset($pagination->getOffset())
+            ->limit($pagination->getLimit())
             ->all();
 
-        return $this->render('index', ['books' => $books]);
+        return $this->render('index', ['books' => $books, 'pagination' => $pagination]);
     }
 
     /**

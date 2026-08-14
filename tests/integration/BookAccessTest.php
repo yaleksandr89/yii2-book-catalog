@@ -23,6 +23,19 @@ final class BookAccessTest extends TestCase
         self::assertIsString($this->app->runAction('book/view', ['id' => $book->id]));
     }
 
+    #[TestDox('Первая страница списка книг содержит не более десяти книг')]
+    public function testFirstBookPageContainsOnlyTenBooks(): void
+    {
+        for ($number = 1; $number <= 11; $number++) {
+            $this->createBook(sprintf('Книга %02d', $number));
+        }
+
+        $html = $this->app->runAction('book/index');
+
+        self::assertSame(11, substr_count($html, '<tr>'));
+        self::assertStringNotContainsString('Книга 11', $html);
+    }
+
     #[TestDox('Гость не может открыть создание книги')]
     public function testGuestCannotCreateBook(): void
     {
@@ -83,12 +96,12 @@ final class BookAccessTest extends TestCase
         self::assertNull(Book::findOne($book->id));
     }
 
-    private function createBook(): Book
+    private function createBook(string $title = 'Тестовая книга'): Book
     {
         $author = new Author(['full_name' => 'Тестовый Автор']);
         self::assertTrue($author->save());
         $book = new Book([
-            'title' => 'Тестовая книга',
+            'title' => $title,
             'release_year' => 2025,
             'description' => 'Описание тестовой книги.',
             'isbn' => '978-5-00-000002-4',

@@ -17,6 +17,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $_GET = [];
+        $_POST = [];
         $this->app = new Application(require dirname(__DIR__) . '/config/test.php');
         Yii::$app = $this->app;
         FileHelper::createDirectory(dirname(__DIR__) . '/runtime/test-assets');
@@ -26,6 +28,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function tearDown(): void
     {
+        $this->app->db->createCommand()->delete('{{%subscription}}')->execute();
         $this->app->db->createCommand()->delete('{{%book_author}}')->execute();
         $this->app->db->createCommand()->delete('{{%book}}')->execute();
         $this->app->db->createCommand()->delete('{{%author}}')->execute();
@@ -34,6 +37,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         UploadedFile::reset();
         $this->app->user->logout(false);
         $this->app->db->close();
+        $_GET = [];
+        $_POST = [];
         restore_error_handler();
         restore_exception_handler();
         parent::tearDown();

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 /** @var yii\web\View $this */
 /** @var app\models\Book[] $books */
+/** @var yii\data\Pagination $pagination */
 
 use yii\bootstrap5\Html;
+use yii\bootstrap5\LinkPager;
 
 $this->title = 'Книги';
 $this->params['breadcrumbs'][] = $this->title;
@@ -47,5 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
             </table>
         </div>
+        <?= LinkPager::widget(['pagination' => $pagination]) ?>
     <?php endif; ?>
 </div>
