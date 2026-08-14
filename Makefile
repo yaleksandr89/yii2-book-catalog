@@ -29,7 +29,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -58,6 +58,9 @@ help:
 	@printf '%s\n' '  make composer CMD="..."                 Run Composer in php as app / Запустить Composer в PHP-контейнере от app'
 	@printf '%s\n' '  make composer-install                  Install locked Composer dependencies / Установить Composer-зависимости из lock-файла'
 	@printf '%s\n' '  make migrate                           Run Yii database migrations / Применить миграции Yii'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Development data / Данные для разработки:'
+	@printf '%s\n' '  make demo-data                         Append deterministic demo catalog data / Добавить детерминированные демо-данные каталога'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Tests / Тесты:'
 	@printf '%s\n' '  make test-db-init                      Create the isolated MySQL test database / Создать изолированную тестовую БД MySQL'
@@ -148,6 +151,9 @@ composer-install: check-env
 
 migrate: check-env
 	@$(COMPOSE) exec --user app php ./yii migrate --interactive=0
+
+demo-data: check-env
+	@$(COMPOSE) exec --user app php ./yii demo-data/fill
 
 test-db-init: check-env
 	@test -n "$(MYSQL_TEST_DATABASE)" || (echo 'MYSQL_TEST_DATABASE must be set in .env.docker.' >&2; exit 1)
