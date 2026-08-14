@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 use Yii;
 use yii\web\MethodNotAllowedHttpException;
+use yii\web\NotFoundHttpException;
 
 final class BookAccessTest extends TestCase
 {
@@ -96,6 +97,67 @@ final class BookAccessTest extends TestCase
         self::assertNull(Book::findOne($book->id));
     }
 
+    #[TestDox('Запрос отсутствующей книги возвращает 404')]
+    public function testMissingBookReturnsNotFound(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->app->runAction('book/view', ['id' => 999999]);
+    }
+
+    #[TestDox('Аутентифицированный пользователь создаёт книгу с загруженной обложкой')]
+    public function testAuthenticatedUserCanCreateBookFromPostWithUpload(): void
+    {
+        $author = $this->createAuthor('Автор новой книги');
+        $this->login();
+        $_POST = ['BookForm' => [
+            'title' => 'Книга из HTTP-формы',
+            'releaseYear' => '2024',
+            'description' => 'Описание книги из формы.',
+            'isbn' => '978-5-00-000010-9',
+            'authorIds' => [(string) $author->id],
+        ]];
+        $this->setUploadedPng();
+        $this->setRequestMethod('POST');
+
+        $this->app->runAction('book/create');
+
+        $book = Book::find()->where(['title' => 'Книга из HTTP-формы'])->one();
+        self::assertNotNull($book);
+        self::assertSame(302, $this->app->response->statusCode);
+        self::assertSame([$author->id], array_column($book->authors, 'id'));
+        self::assertFileExists(Yii::getAlias('@runtime/test-book-uploads/' . basename($book->image_path)));
+    }
+
+    #[TestDox('Аутентифицированный пользователь обновляет книгу без замены обложки')]
+    public function testAuthenticatedUserCanUpdateBookFromPostWithoutUpload(): void
+    {
+        $book = $this->createBook();
+        $replacementAuthor = $this->createAuthor('Новый автор книги');
+        $oldImagePath = $book->image_path;
+        $oldImageFile = Yii::getAlias('@runtime/test-book-uploads/' . basename($oldImagePath));
+        self::assertNotFalse(file_put_contents($oldImageFile, 'old cover'));
+        $this->login();
+        $_POST = ['BookForm' => [
+            'title' => 'Обновлённая книга из HTTP-формы',
+            'releaseYear' => '2025',
+            'description' => 'Новое описание книги.',
+            'isbn' => '978-5-00-000011-6',
+            'authorIds' => [(string) $replacementAuthor->id],
+        ]];
+        $this->setRequestMethod('POST');
+
+        $this->app->runAction('book/update', ['id' => $book->id]);
+
+        $persistedBook = Book::findOne($book->id);
+        self::assertNotNull($persistedBook);
+        self::assertSame('Обновлённая книга из HTTP-формы', $persistedBook->title);
+        self::assertSame($oldImagePath, $persistedBook->image_path);
+        self::assertSame([$replacementAuthor->id], array_column($persistedBook->authors, 'id'));
+        self::assertFileExists($oldImageFile);
+        self::assertSame(302, $this->app->response->statusCode);
+    }
+
     private function createBook(string $title = 'Тестовая книга'): Book
     {
         $author = new Author(['full_name' => 'Тестовый Автор']);
@@ -114,6 +176,32 @@ final class BookAccessTest extends TestCase
         ])->execute();
 
         return $book;
+    }
+
+    private function createAuthor(string $fullName): Author
+    {
+        $author = new Author(['full_name' => $fullName]);
+        self::assertTrue($author->save());
+
+        return $author;
+    }
+
+    private function setUploadedPng(): void
+    {
+        $path = Yii::getAlias('@runtime/test-book-uploads/http-upload.png');
+        $contents = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+            true,
+        );
+        self::assertIsString($contents);
+        self::assertNotFalse(file_put_contents($path, $contents));
+        $_FILES = ['BookForm' => [
+            'name' => ['image' => 'http-upload.png'],
+            'type' => ['image' => 'image/png'],
+            'tmp_name' => ['image' => $path],
+            'error' => ['image' => UPLOAD_ERR_OK],
+            'size' => ['image' => filesize($path)],
+        ]];
     }
 
     private function login(): void

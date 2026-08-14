@@ -5,19 +5,10 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'name' => 'Yii2 Book Catalog',
     'basePath' => dirname(__DIR__),
     'language' => 'ru-RU',
     'bootstrap' => ['log'],
-    'container' => [
-        'singletons' => [
-            \yii\mail\MailerInterface::class => [
-                'class' => \yii\symfonymailer\Mailer::class,
-                // send all mails to a file by default.
-                'useFileTransport' => true,
-                'viewPath' => '@app/mail',
-            ],
-        ],
-    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -38,7 +29,6 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => \yii\mail\MailerInterface::class,
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

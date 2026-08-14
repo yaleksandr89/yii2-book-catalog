@@ -31,7 +31,7 @@ final class BookForm extends Model
             [['releaseYear'], 'integer', 'min' => 1000, 'max' => 9999],
             [['authorIds'], 'filter', 'filter' => [$this, 'normalizeAuthorIds'], 'skipOnEmpty' => false],
             [['authorIds'], 'each', 'rule' => ['integer']],
-            [['authorIds'], 'validateAuthorIds'],
+            [['authorIds'], 'validateAuthorIds', 'skipOnError' => true],
             [
                 ['image'],
                 'file',
@@ -136,11 +136,9 @@ final class BookForm extends Model
 
     public function validateAuthorIds(string $attribute): void
     {
-        if ($this->hasErrors($attribute) || !is_array($this->authorIds) || $this->authorIds === []) {
-            return;
-        }
-
-        $authorIds = array_values(array_unique(array_map('intval', $this->authorIds)));
+        $authorIds = array_values(
+            array_unique($this->getNormalizedAuthorIds())
+        );
         $existingCount = (int) Author::find()->where(['id' => $authorIds])->count();
         if ($existingCount !== count($authorIds)) {
             $this->addError($attribute, 'Выбран неизвестный автор.');

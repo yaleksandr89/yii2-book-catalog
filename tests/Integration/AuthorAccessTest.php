@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 use Yii;
 use yii\web\MethodNotAllowedHttpException;
+use yii\web\NotFoundHttpException;
 
 final class AuthorAccessTest extends TestCase
 {
@@ -58,6 +59,35 @@ final class AuthorAccessTest extends TestCase
 
         self::assertIsString($this->app->runAction('author/create'));
         self::assertIsString($this->app->runAction('author/update', ['id' => $author->id]));
+    }
+
+    #[TestDox('Аутентифицированный пользователь создаёт и редактирует автора')]
+    public function testAuthenticatedUserCanCreateAndUpdateAuthor(): void
+    {
+        $this->login();
+
+        $_POST = ['Author' => ['full_name' => 'Новый автор']];
+        $this->setRequestMethod('POST');
+        $this->app->runAction('author/create');
+
+        $author = Author::find()->where(['full_name' => 'Новый автор'])->one();
+        self::assertNotNull($author);
+        self::assertSame(302, $this->app->response->statusCode);
+
+        $_POST = ['Author' => ['full_name' => 'Переименованный автор']];
+        $this->setRequestMethod('POST');
+        $this->app->runAction('author/update', ['id' => $author->id]);
+
+        self::assertSame('Переименованный автор', Author::findOne($author->id)?->full_name);
+        self::assertSame(302, $this->app->response->statusCode);
+    }
+
+    #[TestDox('Запрос отсутствующего автора возвращает 404')]
+    public function testMissingAuthorReturnsNotFound(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->app->runAction('author/view', ['id' => 999999]);
     }
 
     #[TestDox('GET-запрос на удаление отклоняется')]

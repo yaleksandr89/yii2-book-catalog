@@ -24,8 +24,8 @@ final class SubscriptionForm extends Model
     {
         return [
             [['phone'], 'required', 'message' => 'Введите телефон.'],
-            [['phone'], 'validatePhone'],
-            [['phone'], 'validateDuplicate'],
+            [['phone'], 'validatePhone', 'skipOnError' => true],
+            [['phone'], 'validateDuplicate', 'skipOnError' => true],
         ];
     }
 
@@ -45,10 +45,6 @@ final class SubscriptionForm extends Model
 
     public function validatePhone(string $attribute): void
     {
-        if ($this->hasErrors($attribute)) {
-            return;
-        }
-
         $normalized = $this->normalizePhone($this->phone);
 
         if (preg_match('/^[1-9]\d{9,14}$/', $normalized) !== 1) {
@@ -65,14 +61,12 @@ final class SubscriptionForm extends Model
 
     public function validateDuplicate(string $attribute): void
     {
-        if ($this->hasErrors($attribute) || $this->normalizedPhone === null) {
-            return;
-        }
+        $normalizedPhone = $this->getNormalizedPhone();
 
         $exists = Subscription::find()
             ->where([
                 'author_id' => $this->authorId,
-                'phone' => $this->normalizedPhone,
+                'phone' => $normalizedPhone,
             ])
             ->exists();
 

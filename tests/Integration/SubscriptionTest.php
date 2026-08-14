@@ -7,11 +7,28 @@ namespace Tests\Integration;
 use app\models\Author;
 use app\models\Subscription;
 use app\models\SubscriptionForm;
+use LogicException;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
+use Yii;
+use yii\base\Event;
+use yii\db\ActiveRecord;
+use yii\web\NotFoundHttpException;
 
 final class SubscriptionTest extends TestCase
 {
+    #[TestDox('Нормализованный телефон недоступен до успешной валидации')]
+    public function testNormalizedPhoneRequiresSuccessfulValidation(): void
+    {
+        $form = new SubscriptionForm(
+            $this->createAuthor('Автор непроверенной подписки')->id,
+            ['phone' => '+1 (234) 567-89-01'],
+        );
+
+        $this->expectException(LogicException::class);
+        $form->getNormalizedPhone();
+    }
+
     #[TestDox('Эквивалентные форматы телефона сохраняются в одном каноническом виде и не дублируются у автора')]
     public function testEquivalentPhonesAreNormalizedAndRejectedAsDuplicatesForOneAuthor(): void
     {
@@ -86,6 +103,45 @@ final class SubscriptionTest extends TestCase
         self::assertNotNull($subscription);
         self::assertSame($author->id, $subscription->author_id);
         self::assertSame('12345678901', $subscription->phone);
+    }
+
+    #[TestDox('Уникальное ограничение защищает подписку от конкурентной вставки')]
+    public function testConcurrentSubscriptionInsertReturnsDuplicateError(): void
+    {
+        $author = $this->createAuthor('Автор конкурентной подписки');
+        $canonicalPhone = '12345678901';
+        $handler = static function (Event $event) use ($author, $canonicalPhone): void {
+            Yii::$app->db->createCommand()->insert('{{%subscription}}', [
+                'author_id' => $author->id,
+                'phone' => $canonicalPhone,
+            ])->execute();
+        };
+        Event::on(Subscription::class, ActiveRecord::EVENT_BEFORE_INSERT, $handler);
+        $_POST = ['SubscriptionForm' => ['phone' => '+1 (234) 567-89-01']];
+        $this->setRequestMethod('POST');
+
+        try {
+            $html = $this->app->runAction('subscription/create', ['authorId' => $author->id]);
+        } finally {
+            Event::off(Subscription::class, ActiveRecord::EVENT_BEFORE_INSERT, $handler);
+        }
+
+        self::assertIsString($html);
+        self::assertStringContainsString('Этот номер уже подписан на автора.', $html);
+        self::assertSame(
+            1,
+            (int) Subscription::find()
+                ->where(['author_id' => $author->id, 'phone' => $canonicalPhone])
+                ->count(),
+        );
+    }
+
+    #[TestDox('Подписка на отсутствующего автора возвращает 404')]
+    public function testSubscriptionForMissingAuthorReturnsNotFound(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->app->runAction('subscription/create', ['authorId' => 999999]);
     }
 
     private function createAuthor(string $fullName): Author

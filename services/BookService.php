@@ -160,9 +160,6 @@ final class BookService
      */
     private function saveImage(BookForm $form): string
     {
-        if ($form->image === null) {
-            throw new RuntimeException('Изображение не загружено.');
-        }
         if (!FileHelper::createDirectory($this->storageRoot)) {
             throw new RuntimeException('Не удалось создать каталог изображений книг.');
         }

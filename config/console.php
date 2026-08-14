@@ -8,12 +8,6 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'app\commands',
-    'controllerMap' => [
-        'about' => [
-            'class' => \app\commands\HelloController::class,
-            'defaultAction' => 'about',
-        ],
-    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',

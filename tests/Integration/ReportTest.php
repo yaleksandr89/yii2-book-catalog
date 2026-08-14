@@ -57,6 +57,18 @@ final class ReportTest extends TestCase
         self::assertIsString($this->app->runAction('report/top-authors'));
     }
 
+    #[TestDox('Некорректный год не выводит рейтинг')]
+    public function testInvalidYearDoesNotRenderRanking(): void
+    {
+        $author = $this->createAuthor('Автор с некорректным годом');
+        $this->createBooks($author, 1, 2024);
+        $_GET = ['TopAuthorsReportForm' => ['year' => '999']];
+
+        $html = $this->app->runAction('report/top-authors');
+
+        self::assertStringNotContainsString($author->full_name, $html);
+    }
+
     private function createAuthor(string $fullName): Author
     {
         $author = new Author(['full_name' => $fullName]);

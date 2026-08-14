@@ -19,6 +19,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $_GET = [];
         $_POST = [];
+        $_FILES = [];
         $this->app = new Application(require dirname(__DIR__) . '/config/test.php');
         Yii::$app = $this->app;
         FileHelper::createDirectory(dirname(__DIR__) . '/runtime/test-assets');
@@ -39,6 +40,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $this->app->db->close();
         $_GET = [];
         $_POST = [];
+        $_FILES = [];
         restore_error_handler();
         restore_exception_handler();
         parent::tearDown();

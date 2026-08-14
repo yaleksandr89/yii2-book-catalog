@@ -29,7 +29,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox mysql-reinit check composer-validate php-lint phpstan-check phpcs-check phpcs-fix
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox coverage coverage-html mysql-reinit check composer-validate php-lint phpstan-check phpcs-check phpcs-fix
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -67,6 +67,8 @@ help:
 	@printf '%s\n' '  make test-db-migrate                   Apply migrations to the test database / Применить миграции в тестовую БД'
 	@printf '%s\n' '  make test                              Run PHPUnit against the test database / Запустить PHPUnit на тестовой БД'
 	@printf '%s\n' '  make test-dox                          Run PHPUnit with readable TestDox output / Запустить PHPUnit с читаемым TestDox-выводом'
+	@printf '%s\n' '  make coverage                          Run PHPUnit/Xdebug coverage diagnostic / Запустить диагностику покрытия PHPUnit/Xdebug'
+	@printf '%s\n' '  make coverage-html                     Write PHPUnit/Xdebug HTML coverage to runtime/coverage / Записать HTML-отчёт покрытия в runtime/coverage'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Quality / Качество:'
 	@printf '%s\n' '  make check                             Run all configured read-only quality checks / Запустить все настроенные проверки качества без изменения файлов'
@@ -181,6 +183,13 @@ test: check-env
 
 test-dox: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --testdox
+
+coverage: check-env
+	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-text --show-uncovered-for-coverage-text
+
+coverage-html: check-env
+	@$(COMPOSE) exec --user app php rm -rf runtime/coverage
+	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-html runtime/coverage
 
 composer-validate: check-env
 	@$(COMPOSE) exec --user app php composer validate

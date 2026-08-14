@@ -47,6 +47,38 @@ final class UserTest extends TestCase
         self::assertSame(['Неверное имя пользователя или пароль.'], $form->getErrors('password'));
     }
 
+    #[TestDox('Несуществующее имя пользователя отклоняется без входа и раскрытия причины')]
+    public function testUnknownUsernameIsRejectedWithGenericPasswordError(): void
+    {
+        $form = new LoginForm([
+            'username' => 'missing-reader',
+            'password' => 'any-password',
+        ]);
+
+        self::assertFalse($form->login());
+        self::assertTrue(Yii::$app->user->isGuest);
+        self::assertSame(['Неверное имя пользователя или пароль.'], $form->getErrors('password'));
+    }
+
+    #[TestDox('Сохраненный пользователь реализует контракты IdentityInterface')]
+    public function testPersistedUserImplementsIdentityContracts(): void
+    {
+        $user = $this->createUser('identity-reader', 'correct-password');
+
+        self::assertSame($user->id, User::findIdentity($user->id)?->id);
+        self::assertNull(User::findIdentity(999999));
+        self::assertSame($user->id, $user->getId());
+        self::assertSame($user->auth_key, $user->getAuthKey());
+        self::assertTrue($user->validateAuthKey($user->auth_key));
+        self::assertFalse($user->validateAuthKey('wrong-auth-key'));
+    }
+
+    #[TestDox('Web-приложение не поддерживает access-token identity')]
+    public function testAccessTokenIdentityIsNotSupported(): void
+    {
+        self::assertNull(User::findIdentityByAccessToken('unused-access-token'));
+    }
+
     private function createUser(string $username, string $password): User
     {
         $user = new User([

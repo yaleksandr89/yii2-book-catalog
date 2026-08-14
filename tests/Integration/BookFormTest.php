@@ -84,10 +84,20 @@ final class BookFormTest extends TestCase
         self::assertNotEmpty($form->getErrors('releaseYear'));
     }
 
+    #[TestDox('Строковое значение авторов из HTTP-ввода отклоняется')]
+    public function testScalarAuthorIdsAreRejected(): void
+    {
+        $form = $this->validCreateForm('1');
+
+        self::assertFalse($form->validate());
+        self::assertNotEmpty($form->getErrors('authorIds'));
+        self::assertSame([], $form->getNormalizedAuthorIds());
+    }
+
     /**
-     * @param array<array-key, int|string> $authorIds
+     * @param array<array-key, int|string>|string $authorIds
      */
-    private function validCreateForm(array $authorIds): BookForm
+    private function validCreateForm(array|string $authorIds): BookForm
     {
         return new BookForm([
             'scenario' => BookForm::SCENARIO_CREATE,
