@@ -12,8 +12,8 @@ final class LoginForm extends Model
     public string $username = '';
     public string $password = '';
     public bool $rememberMe = true;
-    private ?User $_user = null;
-    private bool $_userLoaded = false;
+    private ?User $user = null;
+    private bool $userLoaded = false;
 
     public function rules(): array
     {
@@ -42,12 +42,12 @@ final class LoginForm extends Model
 
     public function getUser(): ?User
     {
-        if (!$this->_userLoaded) {
-            $this->_user = User::findByUsername($this->username);
-            $this->_userLoaded = true;
+        if (!$this->userLoaded) {
+            $this->user = User::findByUsername($this->username);
+            $this->userLoaded = true;
         }
 
-        return $this->_user;
+        return $this->user;
     }
 
     public function attributeLabels(): array

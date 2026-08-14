@@ -32,7 +32,7 @@ $this->params['breadcrumbs'] = [['label' => 'Книги', 'url' => ['index']], $
             </dl>
         </div>
     </div>
-    <?php if (!Yii::$app->user->isGuest): ?>
+    <?php if (!Yii::$app->user->isGuest) : ?>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(
             'Удалить',

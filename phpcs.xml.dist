@@ -2,15 +2,37 @@
 <ruleset name="Yii2 Book Catalog">
     <arg name="basepath" value="."/>
     <arg name="colors"/>
-    <rule ref="vendor/yiisoft/yii2-coding-standards/Yii2/ruleset.xml"/>
+
+    <rule ref="PSR12"/>
+
+    <!-- Yii migrations require global, timestamp-prefixed class names. -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>migrations/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Classes.ValidClassName.NotPascalCase">
+        <exclude-pattern>migrations/*</exclude-pattern>
+    </rule>
+
+    <!-- Yii entry and bootstrap scripts intentionally define environment constants before bootstrapping. -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>web/index.php</exclude-pattern>
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+        <exclude-pattern>yii</exclude-pattern>
+    </rule>
+
     <exclude-pattern>config/__autocomplete.php</exclude-pattern>
-    <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+
     <file>assets</file>
     <file>commands</file>
     <file>config</file>
     <file>controllers</file>
+    <file>mail</file>
+    <file>migrations</file>
     <file>models</file>
     <file>services</file>
     <file>tests</file>
+    <file>views</file>
+    <file>web/index.php</file>
     <file>widgets</file>
+    <file>yii</file>
 </ruleset>

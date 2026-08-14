@@ -17,13 +17,12 @@ $htmlIcon = <<<HTML
 HTML;
 $labelOptions = ['class' => 'form-label fw-semibold small'];
 ?>
-<?php if (Yii::$app->session->hasFlash('success')): ?>
-
+<?php if (Yii::$app->session->hasFlash('success')) : ?>
 <div class="site-contact-success d-flex align-items-center justify-content-center text-center">
     <div class="site-contact-success-content mx-auto">
         <h1 class="display-6 fw-semibold mb-3">Message sent</h1>
 
-        <?php if (YII_DEBUG && Yii::$app->mailer->useFileTransport): ?>
+        <?php if (YII_DEBUG && Yii::$app->mailer->useFileTransport) : ?>
             <p class="text-body-tertiary small mb-4">
                 Development mode: email saved under
                 <code><?= Yii::getAlias(Yii::$app->mailer->fileTransportPath) ?></code>
@@ -38,8 +37,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
     </div>
 </div>
 
-<?php else: ?>
-
+<?php else : ?>
 <div class="site-contact d-flex align-items-center justify-content-center py-5">
     <div class="card border-0 overflow-hidden login-split-card login-split-card-wide">
         <div class="row g-0">

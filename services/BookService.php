@@ -18,11 +18,11 @@ final class BookService
 {
     private const string RELATIVE_DIRECTORY = 'uploads/books';
 
-    private readonly string $_storageRoot;
+    private readonly string $storageRoot;
 
     public function __construct(string $storageRoot)
     {
-        $this->_storageRoot = Yii::getAlias($storageRoot);
+        $this->storageRoot = Yii::getAlias($storageRoot);
     }
 
     /**
@@ -163,14 +163,14 @@ final class BookService
         if ($form->image === null) {
             throw new RuntimeException('Изображение не загружено.');
         }
-        if (!FileHelper::createDirectory($this->_storageRoot)) {
+        if (!FileHelper::createDirectory($this->storageRoot)) {
             throw new RuntimeException('Не удалось создать каталог изображений книг.');
         }
 
         $extension = strtolower($form->image->extension);
         $filename = bin2hex(random_bytes(16)) . '.' . $extension;
         $relativePath = self::RELATIVE_DIRECTORY . '/' . $filename;
-        if (!$form->image->saveAs($this->_storageRoot . DIRECTORY_SEPARATOR . $filename, false)) {
+        if (!$form->image->saveAs($this->storageRoot . DIRECTORY_SEPARATOR . $filename, false)) {
             throw new RuntimeException('Не удалось сохранить изображение книги.');
         }
 
@@ -205,6 +205,6 @@ final class BookService
             return null;
         }
 
-        return $this->_storageRoot . DIRECTORY_SEPARATOR . basename($relativePath);
+        return $this->storageRoot . DIRECTORY_SEPARATOR . basename($relativePath);
     }
 }

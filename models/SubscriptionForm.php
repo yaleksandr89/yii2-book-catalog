@@ -11,7 +11,7 @@ final class SubscriptionForm extends Model
 {
     public string $phone = '';
 
-    private ?string $_normalizedPhone = null;
+    private ?string $normalizedPhone = null;
 
     public function __construct(
         private readonly int $authorId,
@@ -36,11 +36,11 @@ final class SubscriptionForm extends Model
 
     public function getNormalizedPhone(): string
     {
-        if ($this->_normalizedPhone === null) {
+        if ($this->normalizedPhone === null) {
             throw new LogicException('Телефон не был успешно провалидирован.');
         }
 
-        return $this->_normalizedPhone;
+        return $this->normalizedPhone;
     }
 
     public function validatePhone(string $attribute): void
@@ -60,19 +60,19 @@ final class SubscriptionForm extends Model
             return;
         }
 
-        $this->_normalizedPhone = $normalized;
+        $this->normalizedPhone = $normalized;
     }
 
     public function validateDuplicate(string $attribute): void
     {
-        if ($this->hasErrors($attribute) || $this->_normalizedPhone === null) {
+        if ($this->hasErrors($attribute) || $this->normalizedPhone === null) {
             return;
         }
 
         $exists = Subscription::find()
             ->where([
                 'author_id' => $this->authorId,
-                'phone' => $this->_normalizedPhone,
+                'phone' => $this->normalizedPhone,
             ])
             ->exists();
 

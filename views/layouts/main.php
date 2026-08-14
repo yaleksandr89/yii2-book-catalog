@@ -25,7 +25,7 @@ $this->render('_head');
 
 <main id="main" class="flex-grow-1" role="main">
     <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
+        <?php if (!empty($this->params['breadcrumbs'])) : ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
         <?php endif ?>
         <?= Alert::widget() ?>

@@ -26,9 +26,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     <?php ActiveForm::end() ?>
 
-    <?php if (!$form->hasErrors() && $authors === []): ?>
+    <?php if (!$form->hasErrors() && $authors === []) : ?>
         <p class="text-body-secondary">За выбранный год книги не найдены.</p>
-    <?php elseif ($authors !== []): ?>
+    <?php elseif ($authors !== []) : ?>
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
@@ -39,10 +39,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($authors as $position => $author): ?>
+                    <?php foreach ($authors as $position => $author) : ?>
                         <tr>
                             <td><?= Html::encode((string) ($position + 1)) ?></td>
-                            <td><?= Html::a(Html::encode($author['full_name']), ['/author/view', 'id' => $author['author_id']]) ?></td>
+                            <td>
+                                <?= Html::a(
+                                    Html::encode($author['full_name']),
+                                    ['/author/view', 'id' => $author['author_id']],
+                                ) ?>
+                            </td>
                             <td><?= Html::encode((string) $author['book_count']) ?></td>
                         </tr>
                     <?php endforeach; ?>

@@ -12,9 +12,17 @@ $this->params['breadcrumbs'] = [['label' => 'Авторы', 'url' => ['index']],
 ?>
 <div class="author-view">
     <h1><?= Html::encode($model->full_name) ?></h1>
-    <?= Html::a('Подписаться', ['/subscription/create', 'authorId' => $model->id], ['class' => 'btn btn-outline-primary']) ?>
-    <?php if (!Yii::$app->user->isGuest): ?>
+    <?= Html::a(
+        'Подписаться',
+        ['/subscription/create', 'authorId' => $model->id],
+        ['class' => 'btn btn-outline-primary'],
+    ) ?>
+    <?php if (!Yii::$app->user->isGuest) : ?>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], ['class' => 'btn btn-outline-danger', 'data' => ['method' => 'post', 'confirm' => 'Удалить автора?']]) ?>
+        <?= Html::a(
+            'Удалить',
+            ['delete', 'id' => $model->id],
+            ['class' => 'btn btn-outline-danger', 'data' => ['method' => 'post', 'confirm' => 'Удалить автора?']],
+        ) ?>
     <?php endif; ?>
 </div>

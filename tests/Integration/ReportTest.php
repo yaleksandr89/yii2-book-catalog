@@ -13,7 +13,7 @@ use Yii;
 
 final class ReportTest extends TestCase
 {
-    private int $_bookNumber = 0;
+    private int $bookNumber = 0;
 
     #[TestDox('Рейтинг учитывает только выбранный год и сортирует авторов по числу книг')]
     public function testRankingUsesSelectedYearAndOrdersByBookCount(): void
@@ -35,7 +35,11 @@ final class ReportTest extends TestCase
     public function testRankingLimitsResultsAndOrdersTiesByNameThenId(): void
     {
         $authorIds = [];
-        foreach (['Alpha', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliet', 'Kilo'] as $fullName) {
+        $names = [
+            'Alpha', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
+            'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliet', 'Kilo',
+        ];
+        foreach ($names as $fullName) {
             $author = $this->createAuthor($fullName);
             $authorIds[] = $author->id;
             $this->createBooks($author, 1, 2024);
@@ -65,11 +69,11 @@ final class ReportTest extends TestCase
     {
         for ($index = 0; $index < $count; $index++) {
             $book = new Book([
-                'title' => 'Книга отчёта ' . ++$this->_bookNumber,
+                'title' => 'Книга отчёта ' . ++$this->bookNumber,
                 'release_year' => $year,
                 'description' => 'Описание книги для отчёта.',
-                'isbn' => '978-5-00-' . str_pad((string) $this->_bookNumber, 7, '0', STR_PAD_LEFT),
-                'image_path' => 'uploads/books/report-' . $this->_bookNumber . '.png',
+                'isbn' => '978-5-00-' . str_pad((string) $this->bookNumber, 7, '0', STR_PAD_LEFT),
+                'image_path' => 'uploads/books/report-' . $this->bookNumber . '.png',
             ]);
             self::assertTrue($book->save());
             Yii::$app->db->createCommand()->insert('{{%book_author}}', [

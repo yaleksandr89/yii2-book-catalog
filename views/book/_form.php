@@ -20,8 +20,10 @@ $activeForm = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data
     ArrayHelper::map($authors, 'id', 'full_name'),
     ['multiple' => true, 'size' => min(10, max(3, count($authors)))],
 ) ?>
-<?= $activeForm->field($form, 'image')->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp']) ?>
-<?php if ($form->scenario === $form::SCENARIO_UPDATE): ?>
+<?= $activeForm->field($form, 'image')->fileInput([
+    'accept' => '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp',
+]) ?>
+<?php if ($form->scenario === $form::SCENARIO_UPDATE) : ?>
     <p class="form-text">Если не выбирать новый файл, текущая обложка сохранится.</p>
 <?php endif; ?>
 <div class="form-group">
