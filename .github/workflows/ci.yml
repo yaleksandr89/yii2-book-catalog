@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -50,8 +51,16 @@ jobs:
       - name: Run quality checks
         run: make check
 
-      - name: Run PHPUnit
-        run: make test
+      - name: Run PHPUnit with coverage
+        run: make coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          use_oidc: true
+          files: ./runtime/coverage.xml
+          disable_search: true
+          fail_ci_if_error: true
 
       - name: Run application smoke checks
         run: |

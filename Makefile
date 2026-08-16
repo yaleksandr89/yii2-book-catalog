@@ -185,7 +185,7 @@ test-dox: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --testdox
 
 coverage: check-env
-	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-text --show-uncovered-for-coverage-text
+	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-clover runtime/coverage.xml --coverage-text --show-uncovered-for-coverage-text
 
 coverage-html: check-env
 	@$(COMPOSE) exec --user app php rm -rf runtime/coverage
