@@ -1,0 +1,60 @@
+{
+    "name": "yaleksandr89/yii2-book-catalog",
+    "description": "Yii2 web book catalog with authors, subscriptions, Top-10 report, image uploads, and SMSPilot test notifications.",
+    "keywords": ["yii2", "book-catalog", "mysql", "docker"],
+    "homepage": "https://github.com/yaleksandr89/yii2-book-catalog",
+    "type": "project",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/yaleksandr89/yii2-book-catalog/issues",
+        "source": "https://github.com/yaleksandr89/yii2-book-catalog"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.4.1",
+        "yiisoft/yii2": "~2.0.55",
+        "yiisoft/yii2-bootstrap5": "~2.0.2",
+        "yiisoft/yii2-httpclient": "^2.0.17"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^13.0",
+        "yiisoft/yii2-coding-standards": "^3.0",
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "yiisoft/yii2-gii": "~2.2.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        },
+        "process-timeout": 1800,
+        "fxp-asset": {
+            "enabled": false
+        }
+    },
+    "scripts": {
+        "cs": "./vendor/bin/phpcs",
+        "cs-fix": "./vendor/bin/phpcbf",
+        "post-install-cmd": [
+            "yii\\composer\\Installer::postInstall"
+        ],
+        "post-create-project-cmd": [
+            "yii\\composer\\Installer::postCreateProject",
+            "yii\\composer\\Installer::postInstall"
+        ],
+        "static": "./vendor/bin/phpstan --memory-limit=-1",
+        "tests": "./vendor/bin/phpunit"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
