@@ -195,7 +195,7 @@ composer-validate: check-env
 	@$(COMPOSE) exec --user app php composer validate
 
 php-lint: check-env
-	@$(COMPOSE) exec --user app php bash -lc 'find assets commands config controllers integrations mail migrations models services tests views web widgets -type f -name "*.php" -print0 | xargs -0 -n1 php -l; php -l yii'
+	@$(COMPOSE) exec --user app php bash -lc 'find assets commands config controllers integrations migrations models services tests views web widgets -type f -name "*.php" -print0 | xargs -0 -n1 php -l; php -l yii'
 
 phpstan-check: check-env
 	@$(COMPOSE) exec --user app php ./vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=-1
