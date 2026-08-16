@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Docker / PHP 8.4 / MySQL 8.4
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare environment
+        run: make init
+
+      - name: Validate Docker Compose config
+        run: make config
+
+      - name: Build application image
+        run: make build
+
+      - name: Start services
+        run: make up
+
+      - name: Install locked Composer dependencies
+        run: make composer-install
+
+      - name: Apply development migrations
+        run: make migrate
+
+      - name: Prepare test database
+        run: |
+          make test-db-init
+          make test-db-migrate
+
+      - name: Run quality checks
+        run: make check
+
+      - name: Run PHPUnit
+        run: make test
+
+      - name: Run application smoke checks
+        run: |
+          make db-check
+          make smoke
+
+      - name: Stop services
+        if: always()
+        run: |
+          if [ -f .env.docker ]; then
+            make down
+          fi
