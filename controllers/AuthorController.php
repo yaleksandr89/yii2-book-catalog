@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Author;
 use Throwable;
+use yii\data\ActiveDataProvider;
 use yii\db\Exception as YiiDbException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -38,7 +39,13 @@ final class AuthorController extends Controller
 
     public function actionIndex(): string
     {
-        return $this->render('index', ['authors' => Author::find()->orderBy(['full_name' => SORT_ASC])->all()]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => Author::find()->orderBy(['full_name' => SORT_ASC, 'id' => SORT_ASC]),
+            'pagination' => ['pageSize' => 10],
+            'sort' => false,
+        ]);
+
+        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     /**

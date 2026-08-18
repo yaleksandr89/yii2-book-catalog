@@ -23,6 +23,24 @@ final class AuthorAccessTest extends TestCase
         self::assertIsString($this->app->runAction('author/view', ['id' => $author->id]));
     }
 
+    #[TestDox('Список авторов разбит на страницы по десять записей')]
+    public function testAuthorListIsPaginated(): void
+    {
+        for ($number = 1; $number <= 11; $number++) {
+            $this->createAuthor(sprintf('Автор %02d', $number));
+        }
+
+        $firstPage = $this->app->runAction('author/index');
+
+        self::assertSame(10, substr_count($firstPage, 'class="list-group-item list-group-item-action"'));
+        self::assertStringNotContainsString('Автор 11', $firstPage);
+
+        $this->app->request->setQueryParams(['page' => 2]);
+        $secondPage = $this->app->runAction('author/index');
+
+        self::assertStringContainsString('Автор 11', $secondPage);
+    }
+
     #[TestDox('Гость не может открыть создание автора')]
     public function testGuestCannotCreateAuthor(): void
     {
@@ -112,9 +130,9 @@ final class AuthorAccessTest extends TestCase
         self::assertNull(Author::findOne($author->id));
     }
 
-    private function createAuthor(): Author
+    private function createAuthor(string $fullName = 'Антон Чехов'): Author
     {
-        $author = new Author(['full_name' => 'Антон Чехов']);
+        $author = new Author(['full_name' => $fullName]);
         self::assertTrue($author->save());
 
         return $author;

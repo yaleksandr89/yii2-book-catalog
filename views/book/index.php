@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 /** @var yii\web\View $this */
-/** @var app\models\Book[] $books */
-/** @var yii\data\Pagination $pagination */
+/** @var yii\data\ActiveDataProvider $dataProvider */
 
 use yii\bootstrap5\Html;
 use yii\bootstrap5\LinkPager;
@@ -19,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a('Добавить книгу', ['create'], ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
-    <?php if ($books === []) : ?>
+    <?php if ($dataProvider->getCount() === 0) : ?>
         <p class="text-body-secondary">Книг пока нет.</p>
     <?php else : ?>
         <div class="table-responsive">
@@ -33,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($books as $book) : ?>
+                    <?php foreach ($dataProvider->getModels() as $book) : ?>
                         <tr>
                             <td>
                                 <?= Html::img(
@@ -53,6 +52,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
             </table>
         </div>
-        <?= LinkPager::widget(['pagination' => $pagination]) ?>
+        <?= LinkPager::widget(['pagination' => $dataProvider->getPagination()]) ?>
     <?php endif; ?>
 </div>
