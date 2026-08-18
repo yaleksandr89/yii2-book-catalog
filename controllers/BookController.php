@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\integrations\smspilot\SmsPilotSender;
 use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
 use app\services\BookService;
 use Throwable;
-use Yii;
-use yii\data\Pagination;
+use yii\data\ActiveDataProvider;
+use yii\base\Module;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -21,6 +20,15 @@ use yii\web\UploadedFile;
 
 final class BookController extends Controller
 {
+    public function __construct(
+        string $id,
+        Module $module,
+        private readonly BookService $bookService,
+        array $config = [],
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     public function behaviors(): array
     {
         return [
@@ -43,18 +51,13 @@ final class BookController extends Controller
 
     public function actionIndex(): string
     {
-        $query = Book::find()->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC]);
-        $pagination = new Pagination([
-            'totalCount' => (int) $query->count(),
-            'pageSize' => 10,
+        $dataProvider = new ActiveDataProvider([
+            'query' => Book::find()->with('authors')->orderBy(['title' => SORT_ASC, 'id' => SORT_ASC]),
+            'pagination' => ['pageSize' => 10],
+            'sort' => false,
         ]);
-        $books = $query
-            ->with('authors')
-            ->offset($pagination->getOffset())
-            ->limit($pagination->getLimit())
-            ->all();
 
-        return $this->render('index', ['books' => $books, 'pagination' => $pagination]);
+        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     /**
@@ -75,7 +78,7 @@ final class BookController extends Controller
         if ($form->load($this->request->post())) {
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->validate()) {
-                $book = $this->bookService()->create($form);
+                $book = $this->bookService->create($form);
 
                 return $this->redirect(['view', 'id' => $book->id]);
             }
@@ -96,7 +99,7 @@ final class BookController extends Controller
         if ($form->load($this->request->post())) {
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->validate()) {
-                $this->bookService()->update($book, $form);
+                $this->bookService->update($book, $form);
 
                 return $this->redirect(['view', 'id' => $book->id]);
             }
@@ -115,7 +118,7 @@ final class BookController extends Controller
      */
     public function actionDelete(int $id): Response
     {
-        $this->bookService()->delete($this->findModel($id));
+        $this->bookService->delete($this->findModel($id));
 
         return $this->redirect(['index']);
     }
@@ -131,16 +134,6 @@ final class BookController extends Controller
         }
 
         return $book;
-    }
-
-    private function bookService(): BookService
-    {
-        $smsSender = new SmsPilotSender((string) Yii::$app->params['smsPilotApiKey']);
-
-        return new BookService(
-            (string) Yii::$app->params['bookImageStorageRoot'],
-            $smsSender,
-        );
     }
 
     /**

@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 /** @var yii\web\View $this */
-/** @var app\models\Author[] $authors */
+/** @var yii\data\ActiveDataProvider $dataProvider */
 
 use yii\bootstrap5\Html;
+use yii\bootstrap5\LinkPager;
 
 $this->title = 'Авторы';
 $this->params['breadcrumbs'][] = $this->title;
@@ -17,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a('Добавить автора', ['create'], ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
-    <?php if ($authors === []) : ?>
+    <?php if ($dataProvider->getCount() === 0) : ?>
         <p class="text-body-secondary">Авторов пока нет.</p>
     <?php else : ?>
         <div class="list-group">
-            <?php foreach ($authors as $author) : ?>
+            <?php foreach ($dataProvider->getModels() as $author) : ?>
                 <?= Html::a(
                     Html::encode($author->full_name),
                     ['view', 'id' => $author->id],
@@ -29,5 +30,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 ) ?>
             <?php endforeach; ?>
         </div>
+        <?= LinkPager::widget(['pagination' => $dataProvider->getPagination()]) ?>
     <?php endif; ?>
 </div>

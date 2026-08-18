@@ -13,6 +13,23 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'container' => [
+        'definitions' => [
+            \app\integrations\SmsSenderInterface::class => static function (): \app\integrations\SmsSenderInterface {
+                return new \app\integrations\smspilot\SmsPilotSender(
+                    (string) Yii::$app->params['smsPilotApiKey'],
+                );
+            },
+            \app\services\BookService::class => static function (
+                \yii\di\Container $container,
+            ): \app\services\BookService {
+                return new \app\services\BookService(
+                    (string) Yii::$app->params['bookImageStorageRoot'],
+                    $container->get(\app\integrations\SmsSenderInterface::class),
+                );
+            },
+        ],
+    ],
     'components' => [
         'request' => [
             'cookieValidationKey' => getenv('COOKIE_VALIDATION_KEY') ?: throw new \RuntimeException(
