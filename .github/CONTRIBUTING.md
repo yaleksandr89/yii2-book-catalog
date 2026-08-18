@@ -1,5 +1,11 @@
 # Участие в разработке
 
+## Выберите язык
+
+| Русский | English | Español | 中文 | Français | Deutsch |
+|---|---|---|---|---|---|
+| **Русский** | [English](../docs/contributing/CONTRIBUTING_en.md) | [Español](../docs/contributing/CONTRIBUTING_es.md) | [中文](../docs/contributing/CONTRIBUTING_zh.md) | [Français](../docs/contributing/CONTRIBUTING_fr.md) | [Deutsch](../docs/contributing/CONTRIBUTING_de.md) |
+
 Спасибо за интерес к Yii2 Book Catalog. Это небольшое Yii2 web-приложение, поэтому изменения лучше держать ограниченными, воспроизводимыми и простыми для проверки.
 
 ## Перед началом
