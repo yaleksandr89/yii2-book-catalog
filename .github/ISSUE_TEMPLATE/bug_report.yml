@@ -1,0 +1,58 @@
+name: Сообщение об ошибке
+description: Помогите воспроизвести и исправить проблему в приложении.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за сообщение. Не добавляйте пароли, ключи API, cookie, персональные данные и другие секреты.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Краткое описание
+      description: Что произошло?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги для воспроизведения
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемый результат
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Фактический результат
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Окружение
+      description: Укажите ОС, версию Docker/Compose и браузер, если проблема связана с интерфейсом.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи или дополнительный контекст
+      description: Приложите безопасные фрагменты логов без секретов.
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Подтверждение
+      options:
+        - label: Я проверил(а) последнюю версию `master` или последний релиз и могу воспроизвести проблему.
+          required: true

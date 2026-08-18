@@ -1,0 +1,34 @@
+name: Предложение улучшения
+description: Предложите улучшение, соответствующее назначению приложения.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Опишите пользовательскую проблему и ожидаемое поведение. Крупные изменения сначала обсуждаются в issue.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Проблема или сценарий использования
+      description: Какую задачу сейчас сложно решить?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое поведение
+      description: Что должно измениться?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы
+      description: Какие варианты или обходные пути уже рассматривались?
+  - type: textarea
+    id: scope
+    attributes:
+      label: Границы задачи
+      description: Укажите, если предложение влияет на интерфейс, схему базы данных, документацию или интеграции.

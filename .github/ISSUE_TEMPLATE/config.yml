@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Руководство по разработке
+    url: https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/development.md
+    about: Инструкции по запуску и проверкам проекта.
+  - name: Сообщить об уязвимости
+    url: https://github.com/yaleksandr89/yii2-book-catalog/security/policy
+    about: Не публикуйте детали уязвимости в обычном issue.
