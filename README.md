@@ -9,6 +9,20 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
+<p align="center">
+  <img
+    src="docs/assets/yii2-book-catalog-readme-cover.png"
+    alt="Yii2 Book Catalog — web catalog with authors, subscriptions, Top-10 report and SMSPilot"
+    width="100%"
+  >
+</p>
+
+## Выберите язык
+
+| Русский | English | Español | 中文 | Français | Deutsch |
+|---|---|---|---|---|---|
+| **Выбран** | [English](./docs/readme/README_en.md) | [Español](./docs/readme/README_es.md) | [中文](./docs/readme/README_zh.md) | [Français](./docs/readme/README_fr.md) | [Deutsch](./docs/readme/README_de.md) |
+
 Тестовое веб-приложение на Yii2 и MySQL: каталог книг и авторов с загрузкой обложек, связью «многие ко многим», публичным рейтингом авторов, подписками по телефону и тестовой интеграцией SMSPilot.
 
 При реализации основной упор сделан на разделение ответственности: контроллеры занимаются обработкой HTTP-запросов и проверкой доступа, входные данные валидируются на сервере, составные операции с книгой вынесены в отдельный сервис, а отчёт строится одним агрегатным запросом. Проект запускается в Docker и не требует PHP или Composer на хосте.

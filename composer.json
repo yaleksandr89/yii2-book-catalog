@@ -1,14 +1,38 @@
 {
     "name": "yaleksandr89/yii2-book-catalog",
     "description": "Yii2 web book catalog with authors, subscriptions, Top-10 report, image uploads, and SMSPilot test notifications.",
-    "keywords": ["yii2", "book-catalog", "mysql", "docker"],
     "homepage": "https://github.com/yaleksandr89/yii2-book-catalog",
-    "type": "project",
-    "license": "MIT",
+    "keywords": [
+        "yii2",
+        "book-catalog",
+        "mysql",
+        "docker"
+    ],
+    "authors": [
+        {
+            "name": "Александр Юрченко",
+            "email": "y.aleksandr89@yandex.ru",
+            "homepage": "https://github.com/yaleksandr89",
+            "role": "Developer"
+        }
+    ],
     "support": {
         "issues": "https://github.com/yaleksandr89/yii2-book-catalog/issues",
-        "source": "https://github.com/yaleksandr89/yii2-book-catalog"
+        "source": "https://github.com/yaleksandr89/yii2-book-catalog",
+        "security": "https://github.com/yaleksandr89/yii2-book-catalog/security/policy"
     },
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://boosty.to/backendbezpafosa"
+        },
+        {
+            "type": "other",
+            "url": "https://sponsr.ru/backendbezpafosa/"
+        }
+    ],
+    "type": "project",
+    "license": "MIT",
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.4.1",
@@ -29,15 +53,6 @@
             "Tests\\": "tests/"
         }
     },
-    "config": {
-        "allow-plugins": {
-            "yiisoft/yii2-composer": true
-        },
-        "process-timeout": 1800,
-        "fxp-asset": {
-            "enabled": false
-        }
-    },
     "scripts": {
         "cs": "./vendor/bin/phpcs",
         "cs-fix": "./vendor/bin/phpcbf",
@@ -50,6 +65,16 @@
         ],
         "static": "./vendor/bin/phpstan --memory-limit=-1",
         "tests": "./vendor/bin/phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        },
+        "process-timeout": 1800,
+        "sort-packages": true,
+        "fxp-asset": {
+            "enabled": false
+        }
     },
     "repositories": [
         {

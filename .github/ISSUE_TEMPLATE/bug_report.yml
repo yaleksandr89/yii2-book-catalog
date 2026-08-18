@@ -1,0 +1,73 @@
+name: Bug report / Сообщить об ошибке
+description: Report a reproducible problem with Yii2 Book Catalog / Сообщить о воспроизводимой проблеме Yii2 Book Catalog
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a problem. / Спасибо, что нашли время сообщить о проблеме.
+
+        Do not publish passwords, API keys, cookies, personal data, or other secrets. / Не публикуйте пароли, API-ключи, cookie, персональные данные и другие секреты.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary / Краткое описание
+      description: What happened? / Что произошло?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps / Шаги для воспроизведения
+      description: Describe the smallest sequence that reproduces the problem. / Опишите минимальную последовательность действий для воспроизведения проблемы.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result / Ожидаемый результат
+      description: What did you expect to happen? / Что должно было произойти?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result / Фактический результат
+      description: What happened instead? / Что произошло на самом деле?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / Окружение
+      description: Include OS, Docker/Compose version, and browser when the problem affects the UI. / Укажите ОС, версию Docker/Compose и браузер, если проблема связана с интерфейсом.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or additional context / Очищенные логи или дополнительный контекст
+      description: Include only fragments with passwords, API keys, cookies, personal data, and other secrets removed. / Приложите только фрагменты без паролей, API-ключей, cookie, персональных данных и других секретов.
+      render: text
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation / Подтверждение
+      options:
+        - label: I checked the latest `master` or the latest release and can reproduce the problem. / Я проверил(а) последнюю версию `master` или последний релиз и могу воспроизвести проблему.
+          required: true
+        - label: I searched existing Issues for the same problem. / Я проверил(а) существующие Issues на наличие такой проблемы.
+          required: true
