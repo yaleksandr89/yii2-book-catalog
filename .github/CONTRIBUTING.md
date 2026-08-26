@@ -4,7 +4,7 @@
 
 | Русский | English | Español | 中文 | Français | Deutsch |
 |---|---|---|---|---|---|
-| **Русский** | [English](../docs/contributing/CONTRIBUTING_en.md) | [Español](../docs/contributing/CONTRIBUTING_es.md) | [中文](../docs/contributing/CONTRIBUTING_zh.md) | [Français](../docs/contributing/CONTRIBUTING_fr.md) | [Deutsch](../docs/contributing/CONTRIBUTING_de.md) |
+| **Русский** | [English](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_en.md) | [Español](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_es.md) | [中文](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_zh.md) | [Français](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_fr.md) | [Deutsch](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_de.md) |
 
 Спасибо за интерес к Yii2 Book Catalog. Это небольшое Yii2 web-приложение, поэтому изменения лучше держать ограниченными, воспроизводимыми и простыми для проверки.
 
@@ -12,7 +12,7 @@
 
 - О воспроизводимой ошибке сообщите через GitHub Issue.
 - Для улучшения опишите проблему, сценарий использования и ожидаемое поведение.
-- При проблеме безопасности следуйте [политике безопасности](SECURITY.md) и не публикуйте чувствительные детали.
+- При проблеме безопасности следуйте [политике безопасности](https://github.com/yaleksandr89/yii2-book-catalog/security/policy) и не публикуйте чувствительные детали.
 - Перед крупным изменением сначала убедитесь, что оно соответствует назначению проекта и не расширяет scope без явной причины.
 
 ## Контракт приложения
