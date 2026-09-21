@@ -8,13 +8,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/yaleksandr89/yii2-book-catalog/ci.yml?style=flat-square&label=CI)](https://github.com/yaleksandr89/yii2-book-catalog/actions/workflows/ci.yml)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-<p align="center">
-  <img
-    src="docs/assets/yii2-book-catalog-readme-cover.png"
-    alt="Yii2 Book Catalog — web catalog with authors, subscriptions, Top-10 report and SMSPilot"
-    width="100%"
-  >
-</p>
+![Yii2 Book Catalog — web catalog with authors, subscriptions, Top-10 report and SMSPilot](docs/assets/yii2-book-catalog-readme-cover.png)
 
 ## Выберите язык
 
