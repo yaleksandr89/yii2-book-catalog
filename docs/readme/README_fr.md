@@ -48,7 +48,7 @@ Vous pouvez créer un utilisateur pour la connexion avec la commande console :
 make yii CMD="user/create <username> <password>"
 ```
 
-Utilisez `make demo-data` pour remplir le catalogue avec des données de démonstration. Les autres commandes pour l’environnement, la base de test et les vérifications sont regroupées dans le [guide de développement](../development.md).
+Utilisez `make demo-data` pour remplir le catalogue avec des données de démonstration. Les autres commandes pour l’environnement, la base de test et les vérifications sont regroupées dans le [guide de développement](../guides/development_fr.md).
 
 ## Accès
 
@@ -75,7 +75,7 @@ Les contrôleurs restent petits et gèrent principalement le scénario Web : rec
 
 Le Top-10 utilise un [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php) dédié : le calcul est effectué directement dans la base avec une seule requête au lieu d’être assemblé en PHP à partir de modèles chargés.
 
-Ces décisions, la gestion des images et les limites de responsabilité sont détaillées dans le [guide d’architecture](../architecture.md).
+Ces décisions, la gestion des images et les limites de responsabilité sont détaillées dans le [guide d’architecture](../reference/architecture_fr.md).
 
 ## SMSPilot
 
@@ -83,7 +83,7 @@ Après la création réussie d’un livre, l’application recherche les abonné
 
 La vérification manuelle a montré qu’un message contenant un long titre en cyrillique était facturé par l’émulateur comme un SMS multipart plus coûteux : `19.74` contre `9.87` après réduction du texte. Le titre du livre a donc été retiré de la notification et le message limité à deux variantes courtes pour un ou plusieurs auteurs correspondants.
 
-Les réponses SMSPilot, l’ordre d’envoi et la gestion des erreurs sont décrits dans le [guide d’intégration](../smspilot.md).
+Les réponses SMSPilot, l’ordre d’envoi et la gestion des erreurs sont décrits dans le [guide d’intégration](../reference/smspilot_fr.md).
 
 ## Ce qui reste volontairement simple
 

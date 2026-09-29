@@ -52,7 +52,7 @@ chore: обновить конфигурацию CI
 
 Runtime проекта выполняется через Docker-backed Make targets. PHP, Composer, Yii CLI, PHPUnit, PHPStan и PHPCS на хосте не запускаются.
 
-Инструкции по первому запуску находятся в [руководстве по разработке](../docs/development.md).
+Инструкции по первому запуску находятся в [руководстве по разработке](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development.md).
 
 Перед pull request выполните:
 

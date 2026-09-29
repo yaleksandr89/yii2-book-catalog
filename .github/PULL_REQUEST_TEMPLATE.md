@@ -24,4 +24,4 @@
 - [ ] UI changes include screenshots or a described manual check. / Для изменений интерфейса приложены скриншоты или описана ручная проверка.
 - [ ] Documentation was updated when commands or behavior changed. / Документация обновлена при изменении команд или поведения.
 - [ ] The Pull Request is limited to one coherent task and contains no unrelated generated files or formatting. / Pull Request ограничен одной связной задачей и не содержит несвязанных generated files или форматирования.
-- [ ] README, CONTRIBUTING and SECURITY translations were synchronized when their source text changed. / Переводы README, CONTRIBUTING и SECURITY синхронизированы при изменении исходного текста.
+- [ ] Translated documentation stays semantically aligned when an already translated source document changes. / Переведённая документация синхронизирована, если менялся уже переведённый исходный документ.

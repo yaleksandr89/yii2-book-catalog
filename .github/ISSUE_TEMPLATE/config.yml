@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Development guide / Руководство по разработке
-    url: https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/development.md
+    url: https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development.md
     about: Local setup and project checks / Инструкции по запуску и проверкам проекта.
   - name: Security issue / Проблема безопасности
     url: https://github.com/yaleksandr89/yii2-book-catalog/security/policy

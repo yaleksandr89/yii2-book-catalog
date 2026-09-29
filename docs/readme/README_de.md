@@ -48,7 +48,7 @@ Einen Benutzer für die Anmeldung können Sie mit folgendem Konsolenbefehl erste
 make yii CMD="user/create <username> <password>"
 ```
 
-Mit `make demo-data` lässt sich der Katalog mit Demo-Daten füllen. Weitere Befehle für Umgebung, Testdatenbank und Prüfungen stehen im [Entwicklungsleitfaden](../development.md).
+Mit `make demo-data` lässt sich der Katalog mit Demo-Daten füllen. Weitere Befehle für Umgebung, Testdatenbank und Prüfungen stehen im [Entwicklungsleitfaden](../guides/development_de.md).
 
 ## Zugriff
 
@@ -75,7 +75,7 @@ Controller bleiben klein und bearbeiten hauptsächlich den Web-Ablauf: Anfrage e
 
 Für die Top-10 gibt es eine eigene [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php): Die Zählung erfolgt direkt in der Datenbank mit einer einzigen Abfrage und wird nicht in PHP aus geladenen Modellen zusammengesetzt.
 
-Diese Entscheidungen, die Bildverarbeitung und die Verantwortungsgrenzen werden im [Architekturleitfaden](../architecture.md) ausführlich beschrieben.
+Diese Entscheidungen, die Bildverarbeitung und die Verantwortungsgrenzen werden im [Architekturleitfaden](../reference/architecture_de.md) ausführlich beschrieben.
 
 ## SMSPilot
 
@@ -83,7 +83,7 @@ Nach erfolgreichem Erstellen eines Buchs sucht die Anwendung die Abonnenten sein
 
 Bei der manuellen Prüfung zeigte sich, dass eine Nachricht mit einem langen kyrillischen Buchtitel vom Emulator als teurere mehrteilige SMS berechnet wurde: `19.74` gegenüber `9.87` nach dem Kürzen des Texts. Daher wurde der Buchtitel aus der Benachrichtigung entfernt und der Text auf zwei kurze Varianten für einen oder mehrere passende Autoren begrenzt.
 
-SMSPilot-Antworten, Versandreihenfolge und Fehlerbehandlung sind im [Integrationsleitfaden](../smspilot.md) dokumentiert.
+SMSPilot-Antworten, Versandreihenfolge und Fehlerbehandlung sind im [Integrationsleitfaden](../reference/smspilot_de.md) dokumentiert.
 
 ## Was bewusst einfach gehalten wird
 

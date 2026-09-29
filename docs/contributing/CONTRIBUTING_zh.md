@@ -52,7 +52,7 @@ chore: update CI configuration
 
 项目 runtime 通过 Docker-backed Make targets 执行。不要在宿主机运行 PHP、Composer、Yii CLI、PHPUnit、PHPStan 或 PHPCS。
 
-首次启动说明见[开发指南](../development.md)。
+首次启动说明见[开发指南](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development_zh.md)。
 
 提交 Pull Request 前运行：
 

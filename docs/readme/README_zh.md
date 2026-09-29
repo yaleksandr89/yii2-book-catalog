@@ -48,7 +48,7 @@ make migrate
 make yii CMD="user/create <username> <password>"
 ```
 
-使用 `make demo-data` 可向目录填充演示数据。环境、测试数据库和质量检查的其他命令见[开发指南](../development.md)。
+使用 `make demo-data` 可向目录填充演示数据。环境、测试数据库和质量检查的其他命令见[开发指南](../guides/development_zh.md)。
 
 ## 访问权限
 
@@ -75,7 +75,7 @@ MySQL
 
 Top-10 使用独立的 [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php)：统计直接在数据库中通过单个查询完成，而不是在 PHP 中从已加载模型拼装。
 
-这些设计、图片处理方式和职责边界详见[架构说明](../architecture.md)。
+这些设计、图片处理方式和职责边界详见[架构说明](../reference/architecture_zh.md)。
 
 ## SMSPilot
 
@@ -83,7 +83,7 @@ Top-10 使用独立的 [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php)：�
 
 手工验证发现，包含较长西里尔字母书名的消息会被模拟器按更昂贵的分段短信计算：缩短文本前为 `19.74`，缩短后为 `9.87`。因此通知中移除了书名，并将消息限制为两个简短版本，分别用于一个或多个匹配作者。
 
-SMSPilot 响应、发送顺序和错误处理见[集成说明](../smspilot.md)。
+SMSPilot 响应、发送顺序和错误处理见[集成说明](../reference/smspilot_zh.md)。
 
 ## 有意保持简单的部分
 

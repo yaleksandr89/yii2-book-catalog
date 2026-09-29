@@ -48,7 +48,7 @@ Create a user for sign-in with the console command:
 make yii CMD="user/create <username> <password>"
 ```
 
-Use `make demo-data` to populate the catalog with demo data. Other commands for the environment, test database, and checks are collected in the [development guide](../development.md).
+Use `make demo-data` to populate the catalog with demo data. Other commands for the environment, test database, and checks are collected in the [development guide](../guides/development_en.md).
 
 ## Access
 
@@ -75,7 +75,7 @@ Controllers stay small and mainly handle the web scenario: receive the request, 
 
 The Top-10 uses a dedicated [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php): counting is performed directly in the database with one query instead of being assembled from loaded models in PHP.
 
-These decisions, image handling, and responsibility boundaries are described in detail in the [architecture guide](../architecture.md).
+These decisions, image handling, and responsibility boundaries are described in detail in the [architecture guide](../reference/architecture_en.md).
 
 ## SMSPilot
 
@@ -83,7 +83,7 @@ After a book is created successfully, the application finds subscribers of its a
 
 Manual verification showed that a message containing a long Cyrillic book title was priced by the emulator as a more expensive multipart SMS: `19.74` versus `9.87` after shortening the text. The book title was therefore removed from the notification, and the message was limited to two short variants for one or several matching authors.
 
-SMSPilot responses, send order, and error handling are documented in the [integration guide](../smspilot.md).
+SMSPilot responses, send order, and error handling are documented in the [integration guide](../reference/smspilot_en.md).
 
 ## What is intentionally kept simple
 
