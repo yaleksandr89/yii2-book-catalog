@@ -52,7 +52,7 @@ chore: update CI configuration
 
 Der Runtime-Betrieb erfolgt über Docker-backed Make targets. PHP, Composer, Yii CLI, PHPUnit, PHPStan und PHPCS dürfen nicht auf dem Host ausgeführt werden.
 
-Anweisungen für den ersten Start stehen im [Entwicklungsleitfaden](../development.md).
+Anweisungen für den ersten Start stehen im [Entwicklungsleitfaden](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development_de.md).
 
 Vor einem Pull Request ausführen:
 

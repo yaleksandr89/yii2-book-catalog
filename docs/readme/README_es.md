@@ -48,7 +48,7 @@ Puedes crear un usuario para iniciar sesión con el comando de consola:
 make yii CMD="user/create <username> <password>"
 ```
 
-Usa `make demo-data` para llenar el catálogo con datos de demostración. El resto de comandos para el entorno, la base de datos de pruebas y las comprobaciones están en la [guía de desarrollo](../development.md).
+Usa `make demo-data` para llenar el catálogo con datos de demostración. El resto de comandos para el entorno, la base de datos de pruebas y las comprobaciones están en la [guía de desarrollo](../guides/development_es.md).
 
 ## Acceso
 
@@ -75,7 +75,7 @@ Los controladores se mantienen pequeños y se ocupan principalmente del escenari
 
 Para el Top-10 existe [`TopAuthorsQuery`](../../models/TopAuthorsQuery.php): el cálculo se realiza directamente en la base de datos con una sola consulta, en lugar de construirse en PHP a partir de modelos cargados.
 
-Estas decisiones, el manejo de imágenes y los límites de responsabilidad se explican en la [guía de arquitectura](../architecture.md).
+Estas decisiones, el manejo de imágenes y los límites de responsabilidad se explican en la [guía de arquitectura](../reference/architecture_es.md).
 
 ## SMSPilot
 
@@ -83,7 +83,7 @@ Después de crear correctamente un libro, la aplicación encuentra a los suscrip
 
 La verificación manual mostró que un mensaje con un título largo en cirílico era calculado por el emulador como un SMS multipart más caro: `19.74` frente a `9.87` después de acortar el texto. Por eso se eliminó el título del libro de la notificación y el mensaje quedó limitado a dos variantes cortas para uno o varios autores coincidentes.
 
-Las respuestas de SMSPilot, el orden de envío y el manejo de errores se describen en la [guía de integración](../smspilot.md).
+Las respuestas de SMSPilot, el orden de envío y el manejo de errores se describen en la [guía de integración](../reference/smspilot_es.md).
 
 ## Lo que se mantiene simple intencionadamente
 

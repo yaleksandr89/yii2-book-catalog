@@ -1,5 +1,11 @@
 # Разработка
 
+## Выберите язык
+
+| Русский | English | Español | 中文 | Français | Deutsch |
+|---|---|---|---|---|---|
+| **Выбран** | [English](./development_en.md) | [Español](./development_es.md) | [中文](./development_zh.md) | [Français](./development_fr.md) | [Deutsch](./development_de.md) |
+
 ## Требования
 
 Для работы на хосте нужны:
@@ -9,7 +15,7 @@
 - Docker с поддержкой Compose;
 - редактор и обычные системные утилиты.
 
-PHP, Composer, Yii CLI, клиент MySQL, PHPUnit, PHPStan и PHPCS запускаются внутри контейнеров через команды из [`Makefile`](../Makefile). Устанавливать их на хост отдельно не требуется.
+PHP, Composer, Yii CLI, клиент MySQL, PHPUnit, PHPStan и PHPCS запускаются внутри контейнеров через команды из [`Makefile`](../../Makefile). Устанавливать их на хост отдельно не требуется.
 
 ## Первичная настройка
 
@@ -23,7 +29,7 @@ make composer-install
 make migrate
 ```
 
-`make init` создаёт `.env.docker` на основе [`.env.docker.example`](../.env.docker.example) и подготавливает локальные каталоги, в которые приложение пишет во время работы.
+`make init` создаёт `.env.docker` на основе [`.env.docker.example`](../../.env.docker.example) и подготавливает локальные каталоги, в которые приложение пишет во время работы.
 
 После запуска приложение доступно на `http://localhost:8080`.
 
@@ -75,7 +81,7 @@ make in php
 
 ## База данных и демонстрационные данные
 
-Схема базы данных создаётся только [миграциями Yii](../migrations/):
+Схема базы данных создаётся только [миграциями Yii](../../migrations/):
 
 ```bash
 make migrate
@@ -129,7 +135,7 @@ make coverage
 
 ## Автоматические проверки в GitHub Actions
 
-Сценарий [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) повторяет основные проверки проекта в чистом окружении:
+Сценарий [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) повторяет основные проверки проекта в чистом окружении:
 
 1. подготавливает и запускает Docker-контейнеры;
 2. устанавливает зависимости из `composer.lock` и применяет миграции;

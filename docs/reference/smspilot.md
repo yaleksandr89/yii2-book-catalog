@@ -1,5 +1,11 @@
 # SMSPilot
 
+## Выберите язык
+
+| Русский | English | Español | 中文 | Français | Deutsch |
+|---|---|---|---|---|---|
+| **Выбран** | [English](./smspilot_en.md) | [Español](./smspilot_es.md) | [中文](./smspilot_zh.md) | [Français](./smspilot_fr.md) | [Deutsch](./smspilot_de.md) |
+
 При создании новой книги приложение уведомляет по SMS гостей, подписанных на одного из её авторов. Интеграция работает только в тестовом режиме SMSPilot: запросы проходят через сервис, но реальная доставка оператору не выполняется.
 
 ## Как устроена отправка
@@ -14,9 +20,9 @@ SmsPilotSender
 SMSPilot
 ```
 
-[`BookService`](../services/BookService.php) зависит от небольшого интерфейса [`SmsSenderInterface`](../integrations/SmsSenderInterface.php), а работа с конкретным внешним сервисом находится в [`SmsPilotSender`](../integrations/smspilot/SmsPilotSender.php).
+[`BookService`](../../services/BookService.php) зависит от небольшого интерфейса [`SmsSenderInterface`](../../integrations/SmsSenderInterface.php), а работа с конкретным внешним сервисом находится в [`SmsPilotSender`](../../integrations/smspilot/SmsPilotSender.php).
 
-[`SmsPilotSendResponse`](../integrations/smspilot/SmsPilotSendResponse.php) проверяет, что успешный ответ SMSPilot имеет ожидаемую структуру. Ключ сервиса передаётся через конфигурацию приложения и не хранится в исходном коде.
+[`SmsPilotSendResponse`](../../integrations/smspilot/SmsPilotSendResponse.php) проверяет, что успешный ответ SMSPilot имеет ожидаемую структуру. Ключ сервиса передаётся через конфигурацию приложения и не хранится в исходном коде.
 
 В `SmsPilotSender` для каждого запроса принудительно передаётся `test=1`. Также задан небольшой сетевой тайм-аут и отключено журналирование содержимого HTTP-ответа.
 
@@ -33,7 +39,7 @@ SMSPilot
 
 Благодаря этому недоступность SMSPilot не может отменить уже созданную книгу.
 
-Если внешний сервис возвращает ошибку для одного номера, [`BookService`](../services/BookService.php) записывает предупреждение и продолжает обработку остальных получателей.
+Если внешний сервис возвращает ошибку для одного номера, [`BookService`](../../services/BookService.php) записывает предупреждение и продолжает обработку остальных получателей.
 
 ## Как выбираются получатели
 
@@ -84,9 +90,9 @@ balance   = 60.89
 
 ## Обработка ошибок
 
-[`SmsPilotSender`](../integrations/smspilot/SmsPilotSender.php) преобразует сетевые ошибки, неуспешный HTTP-ответ, некорректный JSON и отказ самого SMSPilot в `RuntimeException` с безопасным сообщением.
+[`SmsPilotSender`](../../integrations/smspilot/SmsPilotSender.php) преобразует сетевые ошибки, неуспешный HTTP-ответ, некорректный JSON и отказ самого SMSPilot в `RuntimeException` с безопасным сообщением.
 
-[`BookService`](../services/BookService.php) перехватывает такую ошибку уже после сохранения книги. В журнал попадает короткое предупреждение без ключа API и без исходного ответа провайдера; следующие получатели продолжают обрабатываться.
+[`BookService`](../../services/BookService.php) перехватывает такую ошибку уже после сохранения книги. В журнал попадает короткое предупреждение без ключа API и без исходного ответа провайдера; следующие получатели продолжают обрабатываться.
 
 Таким образом, сбой уведомления остаётся ошибкой внешней интеграции и не повреждает состояние каталога.
 

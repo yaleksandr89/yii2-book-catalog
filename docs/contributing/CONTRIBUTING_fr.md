@@ -52,7 +52,7 @@ chore: update CI configuration
 
 Le runtime du projet utilise des Make targets adossés à Docker. N’exécutez pas PHP, Composer, Yii CLI, PHPUnit, PHPStan ou PHPCS sur l’hôte.
 
-Les instructions de premier démarrage se trouvent dans le [guide de développement](../development.md).
+Les instructions de premier démarrage se trouvent dans le [guide de développement](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development_fr.md).
 
 Avant une Pull Request, exécutez :
 

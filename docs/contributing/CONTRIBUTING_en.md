@@ -52,7 +52,7 @@ chore: update CI configuration
 
 Project runtime uses Docker-backed Make targets. Do not run PHP, Composer, Yii CLI, PHPUnit, PHPStan, or PHPCS on the host.
 
-First-start instructions are in the [development guide](../development.md).
+First-start instructions are in the [development guide](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development_en.md).
 
 Before a Pull Request, run:
 
