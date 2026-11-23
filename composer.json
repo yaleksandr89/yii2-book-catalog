@@ -19,6 +19,7 @@
     "support": {
         "issues": "https://github.com/yaleksandr89/yii2-book-catalog/issues",
         "source": "https://github.com/yaleksandr89/yii2-book-catalog",
+        "forum": "https://github.com/yaleksandr89/yii2-book-catalog/discussions",
         "security": "https://github.com/yaleksandr89/yii2-book-catalog/security/policy"
     },
     "funding": [
