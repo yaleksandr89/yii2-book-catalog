@@ -29,6 +29,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function tearDown(): void
     {
+        if (!isset($this->app)) {
+            parent::tearDown();
+
+            return;
+        }
+
         $this->app->db->createCommand()->delete('{{%subscription}}')->execute();
         $this->app->db->createCommand()->delete('{{%book_author}}')->execute();
         $this->app->db->createCommand()->delete('{{%book}}')->execute();

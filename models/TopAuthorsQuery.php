@@ -14,7 +14,7 @@ final class TopAuthorsQuery
      */
     public function findByYear(int $year): array
     {
-        /** @var list<array<string, mixed>> $rows */
+        /** @var list<array{author_id: int|string, full_name: string, book_count: int|string}> $rows */
         $rows = new Query()
             ->select([
                 'author_id' => '[[author]].[[id]]',
@@ -33,7 +33,7 @@ final class TopAuthorsQuery
         return array_map(
             static fn(array $row): array => [
                 'author_id' => (int) $row['author_id'],
-                'full_name' => (string) $row['full_name'],
+                'full_name' => $row['full_name'],
                 'book_count' => (int) $row['book_count'],
             ],
             $rows,

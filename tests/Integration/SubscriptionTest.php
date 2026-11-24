@@ -10,7 +10,6 @@ use app\models\SubscriptionForm;
 use LogicException;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 use yii\base\Event;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
@@ -111,7 +110,7 @@ final class SubscriptionTest extends TestCase
         $author = $this->createAuthor('Автор конкурентной подписки');
         $canonicalPhone = '12345678901';
         $handler = static function (Event $event) use ($author, $canonicalPhone): void {
-            Yii::$app->db->createCommand()->insert('{{%subscription}}', [
+            Subscription::getDb()->createCommand()->insert('{{%subscription}}', [
                 'author_id' => $author->id,
                 'phone' => $canonicalPhone,
             ])->execute();

@@ -220,7 +220,7 @@ final class BookServiceTest extends TestCase
                 self::assertSame($phone, $actualPhone);
                 self::assertSame('Новая книга у автора: ' . $author->full_name . '.', $message);
                 self::assertNotNull(Book::find()->where(['title' => $title])->one());
-                self::assertNull(Yii::$app->db->getTransaction());
+                self::assertNull(Book::getDb()->getTransaction());
             });
 
         $book = $this->serviceWith($sender)->create($this->validForm([$author->id], $title));
@@ -391,7 +391,7 @@ final class BookServiceTest extends TestCase
         self::assertNull(Book::findOne($bookId));
         self::assertSame(
             0,
-            Yii::$app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}} WHERE book_id = :bookId')
+            $this->app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}} WHERE book_id = :bookId')
                 ->bindValue(':bookId', $bookId)
                 ->queryScalar(),
         );
@@ -412,7 +412,7 @@ final class BookServiceTest extends TestCase
             'image_path' => '../test-assets/protected.png',
         ]);
         self::assertTrue($book->save());
-        Yii::$app->db->createCommand()->insert('{{%book_author}}', [
+        $this->app->db->createCommand()->insert('{{%book_author}}', [
             'book_id' => $book->id,
             'author_id' => $author->id,
         ])->execute();
@@ -446,6 +446,7 @@ final class BookServiceTest extends TestCase
             self::assertSame($oldImagePath, $persistedBook->image_path);
             self::assertFileExists($this->absolutePath($oldImagePath));
             self::assertSame([$this->absolutePath($oldImagePath)], $this->generatedImages());
+            self::assertNotNull($form->image);
             self::assertFileExists($form->image->tempName);
 
             return;
@@ -469,7 +470,7 @@ final class BookServiceTest extends TestCase
             self::assertNull(Book::find()->where(['title' => 'Не сохранится при создании'])->one());
             self::assertSame([], $this->generatedImages());
             self::assertFileExists($sourcePath);
-            $relationCount = Yii::$app->db
+            $relationCount = $this->app->db
                 ->createCommand('SELECT COUNT(*) FROM {{%book_author}}')
                 ->queryScalar();
             self::assertSame(0, (int) $relationCount);
@@ -587,7 +588,7 @@ final class BookServiceTest extends TestCase
             'authorIds' => array_map('strval', $authorIds),
             'image' => $withImage ? $this->uploadedPng() : null,
         ]);
-        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE));
+        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE) ?: 'Could not encode validation errors.');
 
         return $form;
     }
@@ -619,7 +620,7 @@ final class BookServiceTest extends TestCase
     private function serviceWith(SmsSenderInterface $smsSender): BookService
     {
         return new BookService(
-            (string) Yii::$app->params['bookImageStorageRoot'],
+            (string) $this->app->params['bookImageStorageRoot'],
             $smsSender,
         );
     }

@@ -17,7 +17,7 @@
 ## Checklist / Чек-лист
 
 - [ ] `make check` passes when code, configuration, or quality tooling is affected. / `make check` проходит, если затронуты код, конфигурация или quality tooling.
-- [ ] `make test` passes when application behavior changes. / `make test` проходит при изменении поведения приложения.
+- [ ] An isolated test database was used for PHPUnit. / Для PHPUnit использовалась отдельная тестовая база.
 - [ ] Relevant tests were added or updated when behavior changed. / При изменении поведения добавлены или обновлены релевантные тесты.
 - [ ] Database schema changes use Yii migrations. / Изменения схемы БД оформлены Yii migrations.
 - [ ] No secrets, local `.env*`, personal data, or sensitive logs are included. / Секреты, локальные `.env*`, персональные данные и чувствительные логи не добавлены.

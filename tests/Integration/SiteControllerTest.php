@@ -7,7 +7,6 @@ namespace Tests\Integration;
 use app\models\User;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 use yii\web\MethodNotAllowedHttpException;
 
 final class SiteControllerTest extends TestCase
@@ -50,26 +49,26 @@ final class SiteControllerTest extends TestCase
         $this->app->runAction('site/login');
 
         self::assertSame(302, $this->app->response->statusCode);
-        self::assertSame($user->id, Yii::$app->user->id);
+        self::assertSame($user->id, $this->app->user->id);
     }
 
     #[TestDox('Аутентифицированный пользователь перенаправляется со страницы входа на главную')]
     public function testAuthenticatedUserIsRedirectedFromLogin(): void
     {
         $user = $this->createUser('signed-in-reader', 'correct-password');
-        self::assertTrue(Yii::$app->user->login($user));
+        self::assertTrue($this->app->user->login($user));
 
         $this->app->runAction('site/login');
 
         self::assertSame(302, $this->app->response->statusCode);
-        self::assertSame($user->id, Yii::$app->user->id);
+        self::assertSame($user->id, $this->app->user->id);
     }
 
     #[TestDox('Выход отклоняет GET-запрос аутентифицированного пользователя')]
     public function testLogoutRejectsGetRequest(): void
     {
         $user = $this->createUser('logout-get-reader', 'correct-password');
-        self::assertTrue(Yii::$app->user->login($user));
+        self::assertTrue($this->app->user->login($user));
 
         $this->expectException(MethodNotAllowedHttpException::class);
         $this->app->runAction('site/logout');
@@ -79,12 +78,12 @@ final class SiteControllerTest extends TestCase
     public function testAuthenticatedPostLogoutReturnsUserToGuestState(): void
     {
         $user = $this->createUser('logout-post-reader', 'correct-password');
-        self::assertTrue(Yii::$app->user->login($user));
+        self::assertTrue($this->app->user->login($user));
         $this->setRequestMethod('POST');
 
         $this->app->runAction('site/logout');
 
-        self::assertTrue(Yii::$app->user->isGuest);
+        self::assertTrue($this->app->user->isGuest);
         self::assertSame(302, $this->app->response->statusCode);
     }
 
@@ -92,8 +91,8 @@ final class SiteControllerTest extends TestCase
     {
         $user = new User([
             'username' => $username,
-            'password_hash' => Yii::$app->security->generatePasswordHash($password),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $this->app->security->generatePasswordHash($password),
+            'auth_key' => $this->app->security->generateRandomString(),
         ]);
         self::assertTrue($user->save());
 

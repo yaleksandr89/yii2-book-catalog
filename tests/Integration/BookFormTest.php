@@ -20,7 +20,7 @@ final class BookFormTest extends TestCase
         $secondAuthor = $this->createAuthor('Борис Стругацкий');
         $form = $this->validCreateForm([$firstAuthor->id, (string) $secondAuthor->id, $firstAuthor->id]);
 
-        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE));
+        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE) ?: 'Could not encode validation errors.');
         self::assertSame([$firstAuthor->id, $secondAuthor->id], $form->getNormalizedAuthorIds());
     }
 
@@ -66,7 +66,7 @@ final class BookFormTest extends TestCase
             'authorIds' => [(string) $author->id],
         ]);
 
-        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE));
+        self::assertTrue($form->validate(), json_encode($form->errors, JSON_UNESCAPED_UNICODE) ?: 'Could not encode validation errors.');
     }
 
     #[TestDox('Слишком длинные поля и нечетырёхзначный год отклоняются')]
@@ -160,7 +160,7 @@ final class BookFormTest extends TestCase
 
         self::assertTrue(
             $form->validate(),
-            json_encode($form->errors, JSON_UNESCAPED_UNICODE),
+            json_encode($form->errors, JSON_UNESCAPED_UNICODE) ?: 'Could not encode validation errors.',
         );
     }
 }

@@ -1,20 +1,20 @@
 # Каталог книг на Yii2
 
 [![Source Code](https://img.shields.io/badge/source-yaleksandr89%2Fyii2--book--catalog-blue.svg?style=flat-square)](https://github.com/yaleksandr89/yii2-book-catalog)
-[![PHP](https://img.shields.io/badge/PHP-8.4-777BB4.svg?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![PHP](https://img.shields.io/badge/PHP-8.5-777BB4.svg?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
 [![Yii](https://img.shields.io/badge/Yii-2.0.55-40B3D8.svg?style=flat-square)](https://www.yiiframework.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1.svg?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![CI](https://img.shields.io/github/actions/workflow/status/yaleksandr89/yii2-book-catalog/ci.yml?style=flat-square&label=CI)](https://github.com/yaleksandr89/yii2-book-catalog/actions/workflows/ci.yml)
+[![CI](https://github.com/yaleksandr89/yii2-book-catalog/actions/workflows/ci.yml/badge.svg)](https://github.com/yaleksandr89/yii2-book-catalog/actions/workflows/ci.yml)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-![Yii2 Book Catalog — web catalog with authors, subscriptions, Top-10 report and SMSPilot](docs/assets/yii2-book-catalog-readme-cover.png)
+![Каталог книг на Yii2 с авторами, подписками, рейтингом Top-10 и SMSPilot](docs/assets/yii2-book-catalog-readme-cover.png)
 
 ## Выберите язык
 
 | Русский | English | Español | 中文 | Français | Deutsch |
 |---|---|---|---|---|---|
-| **Выбран** | [English](./docs/readme/README_en.md) | [Español](./docs/readme/README_es.md) | [中文](./docs/readme/README_zh.md) | [Français](./docs/readme/README_fr.md) | [Deutsch](./docs/readme/README_de.md) |
+| **Выбран** | [English](docs/langs/en/README.md) | [Español](docs/langs/es/README.md) | [中文](docs/langs/zh/README.md) | [Français](docs/langs/fr/README.md) | [Deutsch](docs/langs/de/README.md) |
 
 Тестовое веб-приложение на Yii2 и MySQL: каталог книг и авторов с загрузкой обложек, связью «многие ко многим», публичным рейтингом авторов, подписками по телефону и тестовой интеграцией SMSPilot.
 
@@ -48,7 +48,7 @@ make migrate
 make yii CMD="user/create <username> <password>"
 ```
 
-Для заполнения каталога демонстрационными данными доступна команда `make demo-data`. Остальные команды для работы с окружением, тестовой базой и проверками собраны в [руководстве по разработке](docs/guides/development.md).
+Для заполнения каталога демонстрационными данными доступна команда `make demo-data`. Остальные команды для работы с окружением, тестовой базой и проверками собраны в [руководстве по разработке](docs/langs/ru/guides/development.md).
 
 ## Доступ
 
@@ -59,23 +59,26 @@ make yii CMD="user/create <username> <password>"
 
 ## Как устроено приложение
 
-```text
-HTTP-запрос
-    ↓
-контроллер
-    ↓
-модель формы
-    ↓
-сервис / ActiveRecord / отдельный запрос отчёта
-    ↓
-MySQL
+```mermaid
+flowchart TD
+    HTTP["HTTP-запрос"] --> Controller["Контроллер Yii2"]
+    Controller -->|"Чтение каталога"| AR["ActiveRecord"]
+    Controller -->|"Проверка данных"| Form["Модель формы"]
+    Controller -->|"Сохранение после проверки / удаление"| Service["BookService"]
+    Controller -->|"Отчёт после проверки года"| Query["TopAuthorsQuery"]
+    Form -->|"Проверка авторов"| AR
+    Service --> AR
+    Service --> Files["Файлы обложек"]
+    Service -->|"После фиксации создания, тестовый режим"| SMS["SMSPilot"]
+    AR --> DB[("MySQL")]
+    Query --> DB
 ```
 
 Контроллеры остаются небольшими и отвечают в основном за веб-сценарий: получить запрос, проверить доступ, запустить валидацию и передать работу дальше. Данные книги проверяет [`BookForm`](models/BookForm.php), а сохранение книги, её связей с авторами и изображения выполняет [`BookService`](services/BookService.php).
 
 Для Top-10 выделен [`TopAuthorsQuery`](models/TopAuthorsQuery.php): подсчёт выполняется сразу в базе данных одним запросом, а не собирается из загруженных моделей в PHP.
 
-Подробно эти решения, работа с изображениями и границы ответственности разобраны в [описании архитектуры](docs/reference/architecture.md).
+Подробно эти решения, работа с изображениями и границы ответственности разобраны в [описании архитектуры](docs/langs/ru/reference/architecture.md).
 
 ## SMSPilot
 
@@ -83,7 +86,7 @@ MySQL
 
 Во время ручной проверки выяснилось, что сообщение с длинным кириллическим названием книги в эмуляторе рассчитывалось как более дорогое составное SMS: `19.74` против `9.87` после сокращения текста. Поэтому название книги из уведомления убрано, а текст ограничен двумя короткими вариантами для одного или нескольких подходящих авторов.
 
-Ответы SMSPilot, последовательность отправки и обработка ошибок приведены в [описании интеграции](docs/reference/smspilot.md).
+Ответы SMSPilot, последовательность отправки и обработка ошибок приведены в [описании интеграции](docs/langs/ru/reference/smspilot.md).
 
 ## Что намеренно оставлено простым
 

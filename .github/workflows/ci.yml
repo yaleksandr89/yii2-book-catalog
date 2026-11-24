@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -9,7 +11,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,13 +18,15 @@ concurrency:
 
 jobs:
   quality:
-    name: Docker / PHP 8.4 / MySQL 8.4
+    name: Docker / PHP 8.5 / MySQL 8.4
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Prepare environment
         run: make init
@@ -53,14 +56,6 @@ jobs:
 
       - name: Run PHPUnit with coverage
         run: make coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7
-        with:
-          use_oidc: true
-          files: ./runtime/coverage.xml
-          disable_search: true
-          fail_ci_if_error: true
 
       - name: Run application smoke checks
         run: |

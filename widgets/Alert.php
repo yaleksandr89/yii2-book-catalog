@@ -6,18 +6,19 @@ namespace app\widgets;
 
 use Yii;
 use yii\bootstrap5\Alert as BootstrapAlert;
+use yii\web\Application;
 
 /**
- * Alert widget renders a message from session flash. All flash messages are displayed
- * in the sequence they were assigned using setFlash. You can set message as following:
+ * RU: Виджет показывает флеш-сообщения сессии. Через setFlash можно передать
+ * строку или массив сообщений. Внутри каждого типа сохраняется порядок сообщений.
+ * EN: The widget displays session flash messages. Pass a string or an array
+ * of messages to setFlash. Messages retain their order within each type.
  *
  * ```php
  * Yii::$app->session->setFlash('error', 'This is the message');
  * Yii::$app->session->setFlash('success', 'This is the message');
  * Yii::$app->session->setFlash('info', 'This is the message');
  * ```
- *
- * Multiple messages could be set as follows:
  *
  * ```php
  * Yii::$app->session->setFlash('error', ['Error 1', 'Error 2']);
@@ -29,21 +30,23 @@ use yii\bootstrap5\Alert as BootstrapAlert;
 class Alert extends \yii\bootstrap5\Widget
 {
     /**
-     * @var array the alert types configuration for the flash messages.
-     * This array is setup as $key => $value, where:
-     * - key: the name of the session flash variable
-     * - value: the bootstrap alert type (i.e. danger, success, info, warning)
+     * RU: Сопоставляет типы флеш-сообщений с CSS-классами уведомлений Bootstrap.
+     * EN: Maps flash message types to Bootstrap alert CSS classes.
+     *
+     * @var array<string, string>
      */
     public array $alertTypes = [
         'error'   => 'alert-danger',
         'danger'  => 'alert-danger',
         'success' => 'alert-success',
         'info'    => 'alert-info',
-        'warning' => 'alert-warning'
+        'warning' => 'alert-warning',
     ];
     /**
-     * @var array the options for rendering the close button tag.
-     * Array will be passed to [[\yii\bootstrap\Alert::closeButton]].
+     * RU: Параметры кнопки закрытия, передаваемые в [[BootstrapAlert::closeButton]].
+     * EN: Options for the close button passed to [[BootstrapAlert::closeButton]].
+     *
+     * @var array<string, mixed>
      */
     public array $closeButton = [];
     /**
@@ -51,7 +54,9 @@ class Alert extends \yii\bootstrap5\Widget
      */
     public function run(): void
     {
-        $session = Yii::$app->session;
+        $app = Yii::$app;
+        assert($app instanceof Application);
+        $session = $app->session;
 
         if (!$session->getIsActive() && !$session->getHasSessionId()) {
             return;
@@ -70,7 +75,7 @@ class Alert extends \yii\bootstrap5\Widget
                         'options' => [
                             ...$this->options,
                             'id' => $this->getId() . '-' . $type . '-' . $i,
-                            'class' => $this->alertTypes[$type] . $appendClass
+                            'class' => $this->alertTypes[$type] . $appendClass,
                         ],
                     ],
                 );

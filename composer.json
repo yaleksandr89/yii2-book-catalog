@@ -36,15 +36,15 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": ">=8.4.1",
+        "php": "~8.5.0",
         "yiisoft/yii2": "~2.0.55",
         "yiisoft/yii2-bootstrap5": "~2.0.2",
         "yiisoft/yii2-httpclient": "^2.0.17"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "~3.95.0",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^13.0",
-        "yiisoft/yii2-coding-standards": "^3.0",
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-faker": "~2.0.0",
         "yiisoft/yii2-gii": "~2.2.0"
@@ -55,17 +55,26 @@
         }
     },
     "scripts": {
-        "cs": "./vendor/bin/phpcs",
-        "cs-fix": "./vendor/bin/phpcbf",
+        "lint": "find assets commands config controllers integrations migrations models services tests views widgets -type f -name '*.php' -exec php -l {} + && php -l .php-cs-fixer.dist.php web/index.php yii",
+        "test": "phpunit --configuration=phpunit.xml.dist",
+        "analyse": "phpstan analyse --configuration=phpstan.neon.dist --no-progress --memory-limit=-1",
+        "cs:check": "php-cs-fixer check --config=.php-cs-fixer.dist.php --diff",
+        "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "check": [
+            "@composer validate --strict --no-check-publish",
+            "@composer audit --locked",
+            "@lint",
+            "@cs:check",
+            "@analyse",
+            "@test"
+        ],
         "post-install-cmd": [
             "yii\\composer\\Installer::postInstall"
         ],
         "post-create-project-cmd": [
             "yii\\composer\\Installer::postCreateProject",
             "yii\\composer\\Installer::postInstall"
-        ],
-        "static": "./vendor/bin/phpstan --memory-limit=-1",
-        "tests": "./vendor/bin/phpunit"
+        ]
     },
     "config": {
         "allow-plugins": {

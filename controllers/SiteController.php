@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use Yii;
 use app\models\LoginForm;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\Application;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -52,30 +53,23 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
     public function actionIndex(): string
     {
         return $this->render('index');
     }
 
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
     public function actionLogin(): Response|string
     {
-        if (!Yii::$app->user->isGuest) {
+        $app = Yii::$app;
+        assert($app instanceof Application);
+        if (!$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
 
-        if ($model->load($this->request->post()) && $model->login()) {
+        $post = $this->request->post();
+        if (is_array($post) && $model->load($post) && $model->login()) {
             return $this->goBack();
         }
 
@@ -84,14 +78,11 @@ class SiteController extends Controller
         return $this->render('login', ['model' => $model]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
     public function actionLogout(): Response
     {
-        Yii::$app->user->logout();
+        $app = Yii::$app;
+        assert($app instanceof Application);
+        $app->user->logout();
 
         return $this->goHome();
     }

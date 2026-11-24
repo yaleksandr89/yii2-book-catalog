@@ -8,7 +8,9 @@ use app\models\Author;
 use app\models\Book;
 use app\models\BookForm;
 use app\models\User;
+use php_user_filter;
 use PHPUnit\Framework\Attributes\TestDox;
+use RuntimeException;
 use Tests\TestCase;
 use Yii;
 use yii\base\Event;
@@ -89,13 +91,13 @@ final class CommandTest extends TestCase
         );
         self::assertSame(
             30,
-            (int) Yii::$app->db
+            (int) $this->app->db
                 ->createCommand('SELECT COUNT(DISTINCT book_id) FROM {{%book_author}}')
                 ->queryScalar(),
         );
         self::assertGreaterThan(
             30,
-            (int) Yii::$app->db
+            (int) $this->app->db
                 ->createCommand('SELECT COUNT(*) FROM {{%book_author}}')
                 ->queryScalar(),
         );
@@ -160,8 +162,8 @@ final class CommandTest extends TestCase
     {
         $admin = new User([
             'username' => 'admin',
-            'password_hash' => Yii::$app->security->generatePasswordHash('existing-password'),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $this->app->security->generatePasswordHash('existing-password'),
+            'auth_key' => $this->app->security->generateRandomString(),
         ]);
         self::assertTrue($admin->save());
 
@@ -249,7 +251,7 @@ final class CommandTest extends TestCase
         $handler = static function (Event $event) use (&$bookInsertCount): void {
             $bookInsertCount++;
             if ($bookInsertCount === 2) {
-                throw new \RuntimeException('Injected second demo book failure.');
+                throw new RuntimeException('Injected second demo book failure.');
             }
         };
         Event::on(Book::class, ActiveRecord::EVENT_BEFORE_INSERT, $handler);
@@ -265,7 +267,7 @@ final class CommandTest extends TestCase
         $this->assertCatalogIsEmpty();
         self::assertSame(
             0,
-            (int) Yii::$app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}}')->queryScalar(),
+            (int) $this->app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}}')->queryScalar(),
         );
         self::assertSame([], $this->storedImageNames());
     }
@@ -294,11 +296,11 @@ final class CommandTest extends TestCase
         try {
             $stdoutFilter = stream_filter_append(\STDOUT, self::OUTPUT_FILTER, STREAM_FILTER_WRITE);
             if ($stdoutFilter === false) {
-                throw new \RuntimeException('Unable to attach the command STDOUT filter.');
+                throw new RuntimeException('Unable to attach the command STDOUT filter.');
             }
             $stderrFilter = stream_filter_append(\STDERR, self::OUTPUT_FILTER, STREAM_FILTER_WRITE);
             if ($stderrFilter === false) {
-                throw new \RuntimeException('Unable to attach the command STDERR filter.');
+                throw new RuntimeException('Unable to attach the command STDERR filter.');
             }
 
             $exitCode = $consoleApp->runAction($route, $actionParams);
@@ -327,8 +329,18 @@ final class CommandTest extends TestCase
             return;
         }
 
-        if (!stream_filter_register(self::OUTPUT_FILTER, CommandOutputSinkFilter::class)) {
-            throw new \RuntimeException('Unable to register the command output filter.');
+        $filter = new class extends php_user_filter {
+            public function filter($in, $out, &$consumed, bool $closing): int
+            {
+                while ($bucket = stream_bucket_make_writeable($in)) {
+                    $consumed += $bucket->datalen;
+                }
+
+                return PSFS_PASS_ON;
+            }
+        };
+        if (!stream_filter_register(self::OUTPUT_FILTER, $filter::class)) {
+            throw new RuntimeException('Unable to register the command output filter.');
         }
     }
 
@@ -344,7 +356,7 @@ final class CommandTest extends TestCase
         $this->assertCatalogIsEmpty();
         self::assertSame(
             0,
-            (int) Yii::$app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}}')->queryScalar(),
+            (int) $this->app->db->createCommand('SELECT COUNT(*) FROM {{%book_author}}')->queryScalar(),
         );
         self::assertSame([], $this->storedImageNames());
     }
@@ -375,7 +387,7 @@ final class CommandTest extends TestCase
     private function bookImageNames(): array
     {
         $names = array_map(
-            static fn (Book $book): string => basename($book->image_path),
+            static fn(Book $book): string => basename($book->image_path),
             Book::find()->all(),
         );
         sort($names);
@@ -395,17 +407,3 @@ final class CommandTest extends TestCase
         return $names;
     }
 }
-
-// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses -- Test-only filter belongs with its sole consumer.
-final class CommandOutputSinkFilter extends \php_user_filter
-{
-    public function filter($in, $out, &$consumed, bool $closing): int
-    {
-        while ($bucket = stream_bucket_make_writeable($in)) {
-            $consumed += $bucket->datalen;
-        }
-
-        return PSFS_PASS_ON;
-    }
-}
-// phpcs:enable PSR1.Classes.ClassDeclaration.MultipleClasses

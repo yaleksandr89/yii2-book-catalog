@@ -9,8 +9,8 @@ use app\models\Book;
 use app\models\BookForm;
 use app\services\BookService;
 use Throwable;
-use yii\data\ActiveDataProvider;
 use yii\base\Module;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -75,7 +75,8 @@ final class BookController extends Controller
     {
         $form = BookForm::forCreate();
 
-        if ($form->load($this->request->post())) {
+        $post = $this->request->post();
+        if (is_array($post) && $form->load($post)) {
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->validate()) {
                 $book = $this->bookService->create($form);
@@ -96,7 +97,8 @@ final class BookController extends Controller
         $book = $this->findModel($id);
         $form = BookForm::forUpdate($book);
 
-        if ($form->load($this->request->post())) {
+        $post = $this->request->post();
+        if (is_array($post) && $form->load($post)) {
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->validate()) {
                 $this->bookService->update($book, $form);
