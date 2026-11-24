@@ -16,6 +16,7 @@ use yii\db\Exception as YiiDbException;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 final class BookService
 {
@@ -39,11 +40,11 @@ final class BookService
             throw new RuntimeException('Для создания книги требуется изображение.');
         }
 
-        $newImagePath = $this->saveImage($form);
+        $newImagePath = $this->saveImage($form->image);
         $transaction = null;
 
         try {
-            $transaction = Yii::$app->db->beginTransaction();
+            $transaction = Book::getDb()->beginTransaction();
             $book = new Book();
             $this->fillBook($book, $form);
             $book->image_path = $newImagePath;
@@ -74,11 +75,11 @@ final class BookService
     {
         $oldAttributes = $book->getOldAttributes();
         $oldImagePath = $book->image_path;
-        $newImagePath = $form->image === null ? null : $this->saveImage($form);
+        $newImagePath = $form->image === null ? null : $this->saveImage($form->image);
         $transaction = null;
 
         try {
-            $transaction = Yii::$app->db->beginTransaction();
+            $transaction = Book::getDb()->beginTransaction();
             $this->fillBook($book, $form);
             if ($newImagePath !== null) {
                 $book->image_path = $newImagePath;
@@ -116,7 +117,7 @@ final class BookService
     public function delete(Book $book): void
     {
         $imagePath = $book->image_path;
-        $transaction = Yii::$app->db->beginTransaction();
+        $transaction = Book::getDb()->beginTransaction();
 
         try {
             if ($book->delete() === false) {
@@ -148,15 +149,15 @@ final class BookService
      */
     private function syncAuthors(Book $book, array $authorIds): void
     {
-        Yii::$app->db->createCommand()
+        Book::getDb()->createCommand()
             ->delete('{{%book_author}}', ['book_id' => $book->id])
             ->execute();
 
         $rows = array_map(
-            static fn (int $authorId): array => [$book->id, $authorId],
+            static fn(int $authorId): array => [$book->id, $authorId],
             $authorIds,
         );
-        Yii::$app->db->createCommand()
+        Book::getDb()->createCommand()
             ->batchInsert('{{%book_author}}', ['book_id', 'author_id'], $rows)
             ->execute();
     }
@@ -166,7 +167,7 @@ final class BookService
      */
     private function notifySubscribers(array $authorIds): void
     {
-        /** @var array<int, array{phone: string, matching_author_count: string, single_author_name: string}> $recipients */
+        /** @var list<array{phone: string, matching_author_count: int|string, single_author_name: string}> $recipients */
         $recipients = new Query()
             ->select([
                 'phone' => '[[s]].[[phone]]',
@@ -200,16 +201,16 @@ final class BookService
      * @throws YiiBaseException
      * @throws RandomException
      */
-    private function saveImage(BookForm $form): string
+    private function saveImage(UploadedFile $image): string
     {
         if (!FileHelper::createDirectory($this->storageRoot)) {
             throw new RuntimeException('Не удалось создать каталог изображений книг.');
         }
 
-        $extension = strtolower($form->image->extension);
+        $extension = strtolower($image->extension);
         $filename = bin2hex(random_bytes(16)) . '.' . $extension;
         $relativePath = self::RELATIVE_DIRECTORY . '/' . $filename;
-        if (!$form->image->saveAs($this->storageRoot . DIRECTORY_SEPARATOR . $filename, false)) {
+        if (!$image->saveAs($this->storageRoot . DIRECTORY_SEPARATOR . $filename, false)) {
             throw new RuntimeException('Не удалось сохранить изображение книги.');
         }
 

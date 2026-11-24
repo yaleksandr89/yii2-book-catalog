@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use Yii;
+use yii\base\Application;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -62,6 +63,9 @@ final class User extends ActiveRecord implements IdentityInterface
 
     public function validatePassword(string $password): bool
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        $app = Yii::$app;
+        assert($app instanceof Application);
+
+        return $app->security->validatePassword($password, $this->password_hash);
     }
 }

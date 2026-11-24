@@ -9,7 +9,6 @@ use app\models\Book;
 use app\models\TopAuthorsQuery;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 
 final class ReportTest extends TestCase
 {
@@ -65,6 +64,7 @@ final class ReportTest extends TestCase
         $_GET = ['TopAuthorsReportForm' => ['year' => '999']];
 
         $html = $this->app->runAction('report/top-authors');
+        self::assertIsString($html);
 
         self::assertStringNotContainsString($author->full_name, $html);
     }
@@ -88,7 +88,7 @@ final class ReportTest extends TestCase
                 'image_path' => 'uploads/books/report-' . $this->bookNumber . '.png',
             ]);
             self::assertTrue($book->save());
-            Yii::$app->db->createCommand()->insert('{{%book_author}}', [
+            $this->app->db->createCommand()->insert('{{%book_author}}', [
                 'book_id' => $book->id,
                 'author_id' => $author->id,
             ])->execute();

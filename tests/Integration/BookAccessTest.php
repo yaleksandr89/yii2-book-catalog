@@ -32,6 +32,7 @@ final class BookAccessTest extends TestCase
         }
 
         $html = $this->app->runAction('book/index');
+        self::assertIsString($html);
 
         self::assertSame(11, substr_count($html, '<tr>'));
         self::assertStringNotContainsString('Книга 11', $html);
@@ -170,7 +171,7 @@ final class BookAccessTest extends TestCase
             'image_path' => 'uploads/books/' . str_repeat('b', 32) . '.png',
         ]);
         self::assertTrue($book->save());
-        Yii::$app->db->createCommand()->insert('{{%book_author}}', [
+        $this->app->db->createCommand()->insert('{{%book_author}}', [
             'book_id' => $book->id,
             'author_id' => $author->id,
         ])->execute();
@@ -208,10 +209,10 @@ final class BookAccessTest extends TestCase
     {
         $user = new User([
             'username' => 'book-editor',
-            'password_hash' => Yii::$app->security->generatePasswordHash('password'),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $this->app->security->generatePasswordHash('password'),
+            'auth_key' => $this->app->security->generateRandomString(),
         ]);
         self::assertTrue($user->save());
-        self::assertTrue(Yii::$app->user->login($user));
+        self::assertTrue($this->app->user->login($user));
     }
 }

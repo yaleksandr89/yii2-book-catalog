@@ -6,6 +6,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\web\Application;
 
 final class LoginForm extends Model
 {
@@ -37,7 +38,11 @@ final class LoginForm extends Model
             return false;
         }
 
-        return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+        $user = $this->getUser();
+        $app = Yii::$app;
+        assert($app instanceof Application);
+
+        return $user !== null && $app->user->login($user, $this->rememberMe ? 3600 * 24 * 30 : 0);
     }
 
     public function getUser(): ?User

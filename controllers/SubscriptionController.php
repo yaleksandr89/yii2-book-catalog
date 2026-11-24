@@ -10,6 +10,7 @@ use app\models\SubscriptionForm;
 use Yii;
 use yii\db\Exception as YiiDbException;
 use yii\db\IntegrityException;
+use yii\web\Application;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -28,7 +29,8 @@ final class SubscriptionController extends Controller
         }
 
         $form = new SubscriptionForm($author->id);
-        if ($form->load($this->request->post()) && $form->validate()) {
+        $post = $this->request->post();
+        if (is_array($post) && $form->load($post) && $form->validate()) {
             $subscription = new Subscription([
                 'author_id' => $author->id,
                 'phone' => $form->getNormalizedPhone(),
@@ -42,7 +44,9 @@ final class SubscriptionController extends Controller
                 return $this->render('create', ['author' => $author, 'form' => $form]);
             }
 
-            Yii::$app->session->setFlash('success', 'Вы подписались на автора.');
+            $app = Yii::$app;
+            assert($app instanceof Application);
+            $app->session->setFlash('success', 'Вы подписались на автора.');
 
             return $this->redirect(['/author/view', 'id' => $author->id]);
         }

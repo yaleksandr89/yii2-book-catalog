@@ -4,7 +4,7 @@
 
 | Русский | English | Español | 中文 | Français | Deutsch |
 |---|---|---|---|---|---|
-| **Русский** | [English](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_en.md) | [Español](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_es.md) | [中文](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_zh.md) | [Français](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_fr.md) | [Deutsch](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/contributing/CONTRIBUTING_de.md) |
+| **Русский** | [English](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/en/CONTRIBUTING.md) | [Español](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/es/CONTRIBUTING.md) | [中文](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/zh/CONTRIBUTING.md) | [Français](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/fr/CONTRIBUTING.md) | [Deutsch](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/de/CONTRIBUTING.md) |
 
 Спасибо за интерес к Yii2 Book Catalog. Это небольшое Yii2 web-приложение, поэтому изменения лучше держать ограниченными, воспроизводимыми и простыми для проверки.
 
@@ -50,17 +50,17 @@ chore: обновить конфигурацию CI
 
 ## Локальная проверка
 
-Runtime проекта выполняется через Docker-backed Make targets. PHP, Composer, Yii CLI, PHPUnit, PHPStan и PHPCS на хосте не запускаются.
+Runtime проекта выполняется через Docker-backed Make targets. PHP, Composer, Yii CLI, PHPUnit, PHPStan и PHP CS Fixer на хосте не запускаются.
 
-Инструкции по первому запуску находятся в [руководстве по разработке](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/guides/development.md).
+Инструкции по первому запуску находятся в [руководстве по разработке](https://github.com/yaleksandr89/yii2-book-catalog/blob/master/docs/langs/ru/guides/development.md).
 
-Перед pull request выполните:
+Перед pull request подготовьте отдельную локальную тестовую базу согласно руководству выше и выполните:
 
 ```shell
 make check
 ```
 
-Если меняется поведение приложения, дополнительно выполните:
+Для отдельного прогона тестов используйте:
 
 ```shell
 make test

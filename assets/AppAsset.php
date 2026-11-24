@@ -16,7 +16,8 @@ use yii\web\View;
 use yii\web\YiiAsset;
 
 /**
- * Main application asset bundle.
+ * RU: Основной набор ресурсов приложения.
+ * EN: Main application asset bundle.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0

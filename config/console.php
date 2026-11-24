@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
+if (YII_ENV_TEST && getenv('YII2_TEST_DB_GUARD') !== '1') {
+    throw new RuntimeException('Run test migrations through make test-db-migrate.');
+}
+
 $params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$db = require __DIR__ . (YII_ENV_TEST ? '/test_db.php' : '/db.php');
 
 $config = [
     'id' => 'basic-console',
@@ -30,7 +36,9 @@ $config = [
     'params' => $params,
     /*
     'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
+        // RU: Команда генерации фикстур.
+        // EN: Fixture generation command.
+        'fixture' => [
             'class' => 'yii\faker\FixtureController',
         ],
     ],
@@ -38,17 +46,17 @@ $config = [
 ];
 
 if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => \yii\gii\Module::class,
     ];
-    // configuration adjustments for 'dev' environment
-    // requires version `2.1.21` of yii2-debug module
+    // RU: Для отладчика требуется yii2-debug версии 2.1.21 или новее.
+    // EN: The debugger requires yii2-debug 2.1.21 or later.
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => \yii\debug\Module::class,
-        // uncomment the following to add your IP if you are not connecting from localhost.
+        // RU: Для подключения не с localhost раскомментируйте строку и добавьте свой IP.
+        // EN: For connections from outside localhost, uncomment the line and add your IP.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 }

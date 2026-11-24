@@ -10,8 +10,10 @@ use app\models\Book;
 use app\models\BookForm;
 use app\models\User;
 use app\services\BookService;
+use RuntimeException;
 use Throwable;
 use Yii;
+use yii\console\Application;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\web\UploadedFile;
@@ -71,8 +73,10 @@ final class DemoDataController extends Controller
             return ExitCode::DATAERR;
         }
 
-        $storageRoot = Yii::getAlias((string) Yii::$app->params['bookImageStorageRoot']);
-        $smsSender = new SmsPilotSender((string) Yii::$app->params['smsPilotApiKey']);
+        $app = Yii::$app;
+        assert($app instanceof Application);
+        $storageRoot = Yii::getAlias((string) $app->params['bookImageStorageRoot']);
+        $smsSender = new SmsPilotSender((string) $app->params['smsPilotApiKey']);
         $service = new BookService($storageRoot, $smsSender);
 
         if (User::findByUsername('admin') !== null) {
@@ -82,24 +86,24 @@ final class DemoDataController extends Controller
         }
 
         $createdImages = [];
-        $transaction = Yii::$app->db->beginTransaction();
+        $transaction = $app->db->beginTransaction();
 
         try {
             $user = new User([
                 'username' => 'admin',
-                'password_hash' => Yii::$app->security->generatePasswordHash('admin'),
-                'auth_key' => Yii::$app->security->generateRandomString(),
+                'password_hash' => $app->security->generatePasswordHash('admin'),
+                'auth_key' => $app->security->generateRandomString(),
             ]);
 
             if (!$user->save()) {
-                throw new \RuntimeException('Не удалось создать демо-пользователя.');
+                throw new RuntimeException('Не удалось создать демо-пользователя.');
             }
 
             $authorIds = [];
             for ($number = 1; $number <= 12; $number++) {
                 $author = new Author(['full_name' => sprintf('Демо Автор %02d', $number)]);
                 if (!$author->save()) {
-                    throw new \RuntimeException('Не удалось сохранить демо-автора.');
+                    throw new RuntimeException('Не удалось сохранить демо-автора.');
                 }
                 $authorIds[] = $author->id;
             }
@@ -126,7 +130,7 @@ final class DemoDataController extends Controller
                     'image' => $covers[$index % 4],
                 ]);
                 if (!$form->validate()) {
-                    throw new \RuntimeException('Не удалось проверить демо-книгу.');
+                    throw new RuntimeException('Не удалось проверить демо-книгу.');
                 }
 
                 $createdImages[] = $service->create($form)->image_path;

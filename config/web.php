@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -68,7 +70,6 @@ $config = [
 ];
 
 if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => \yii\debug\Module::class,
@@ -82,7 +83,8 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => \yii\gii\Module::class,
-        // uncomment the following to add your IP if you are not connecting from localhost.
+        // RU: Для подключения не с localhost раскомментируйте строку и добавьте свой IP.
+        // EN: For connections from outside localhost, uncomment the line and add your IP.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 }

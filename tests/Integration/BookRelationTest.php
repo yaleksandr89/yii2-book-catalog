@@ -8,7 +8,6 @@ use app\models\Author;
 use app\models\Book;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 
 final class BookRelationTest extends TestCase
 {
@@ -51,7 +50,7 @@ final class BookRelationTest extends TestCase
             'image_path' => 'uploads/books/' . str_repeat('a', 32) . '.png',
         ]);
         self::assertTrue($book->save());
-        Yii::$app->db->createCommand()->insert('{{%book_author}}', [
+        $this->app->db->createCommand()->insert('{{%book_author}}', [
             'book_id' => $book->id,
             'author_id' => $author->id,
         ])->execute();

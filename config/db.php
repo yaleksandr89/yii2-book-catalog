@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'class' => \yii\db\Connection::class,
     'dsn' => sprintf(
@@ -12,7 +14,8 @@ return [
     'password' => getenv('MYSQL_PASSWORD') ?: '',
     'charset' => 'utf8mb4',
 
-    // Schema cache options (for production environment)
+    // RU: Параметры кэширования схемы для production.
+    // EN: Schema cache options for production.
     //'enableSchemaCache' => true,
     //'schemaCacheDuration' => 60,
     //'schemaCache' => 'cache',

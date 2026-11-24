@@ -7,6 +7,7 @@ namespace app\commands;
 use app\models\User;
 use Yii;
 use yii\base\Exception as YiiBaseException;
+use yii\console\Application;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -31,10 +32,12 @@ final class UserController extends Controller
             return ExitCode::DATAERR;
         }
 
+        $app = Yii::$app;
+        assert($app instanceof Application);
         $user = new User([
             'username' => $username,
-            'password_hash' => Yii::$app->security->generatePasswordHash($password),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $app->security->generatePasswordHash($password),
+            'auth_key' => $app->security->generateRandomString(),
         ]);
 
         if (!$user->save()) {

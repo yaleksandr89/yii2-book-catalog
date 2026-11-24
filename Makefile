@@ -2,8 +2,19 @@ PROJECT := yii2-book-catalog
 ENV_FILE := .env.docker
 COMPOSE := docker compose -p $(PROJECT) --env-file $(ENV_FILE)
 CMD ?=
--include $(ENV_FILE)
-MYSQL_TEST_DATABASE ?= yii2_book_catalog_test
+TEST_DB_PREFLIGHT = $(COMPOSE) exec -T --user app php php -r '\
+	try { $$config = require "config/test_db.php"; } \
+	catch (RuntimeException $$exception) { fwrite(STDERR, $$exception->getMessage() . PHP_EOL); exit(1); } \
+	echo substr($$config["dsn"], strlen("mysql:host=mysql;port=3306;dbname="));'
+TEST_DB_MYSQL = $(COMPOSE) exec -T -e MYSQL_TEST_DATABASE="$$test_database" mysql bash -ec
+TEST_DB_SERVICE_GUARD = export LC_ALL=C; \
+	if [[ ! "$$MYSQL_DATABASE" =~ ^[a-zA-Z0-9_-]{1,64}$$ ]]; then \
+		echo "MYSQL_DATABASE must specify an unambiguous MySQL service schema." >&2; exit 1; \
+	fi; \
+	if [[ ! "$$MYSQL_TEST_DATABASE" =~ ^[a-zA-Z0-9_]{1,64}$$ || "$${MYSQL_TEST_DATABASE,,}" == "$${MYSQL_DATABASE,,}" ]]; then \
+		echo "Test database must differ from the MySQL service database." >&2; exit 1; \
+	fi
+TEST_PHP = $(COMPOSE) exec --user app -e YII2_TEST_DB_GUARD=1
 SERVICES := php nginx mysql
 SERVICE_TARGETS := restart log in
 SERVICE_TARGET := $(firstword $(filter $(SERVICE_TARGETS),$(MAKECMDGOALS)))
@@ -29,7 +40,7 @@ $(SERVICE):
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-init test-db-migrate test test-dox coverage coverage-html mysql-reinit check composer-validate php-lint phpstan-check phpcs-check phpcs-fix
+.PHONY: help init check-env cookie-key config build up down restart ps log log-all in smoke db-check php yii composer composer-install migrate demo-data test-db-guard test-db-init test-db-migrate test test-dox coverage coverage-html mysql-reinit check composer-validate composer-audit php-lint phpstan-check cs-check cs-fix
 
 help:
 	@printf '%s\n' 'Bootstrap / Первичная настройка:'
@@ -71,12 +82,13 @@ help:
 	@printf '%s\n' '  make coverage-html                     Write PHPUnit/Xdebug HTML coverage to runtime/coverage / Записать HTML-отчёт покрытия в runtime/coverage'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Quality / Качество:'
-	@printf '%s\n' '  make check                             Run all configured read-only quality checks / Запустить все настроенные проверки качества без изменения файлов'
+	@printf '%s\n' '  make check                             Run quality checks and PHPUnit on the isolated test database / Запустить проверки качества и PHPUnit на изолированной тестовой БД'
 	@printf '%s\n' '  make composer-validate                 Validate Composer files / Проверить Composer-файлы'
+	@printf '%s\n' '  make composer-audit                    Audit locked Composer dependencies / Проверить зависимости из Composer lock-файла'
 	@printf '%s\n' '  make php-lint                          Lint first-party PHP files / Проверить синтаксис PHP-файлов проекта'
-	@printf '%s\n' '  make phpstan-check                     Run PHPStan read-only analysis / Запустить PHPStan-анализ без изменения файлов'
-	@printf '%s\n' '  make phpcs-check                       Run Yii2 PHPCS coding-standard check / Проверить код стандартами Yii2 через PHPCS'
-	@printf '%s\n' '  make phpcs-fix                         Auto-fix Yii2 PHPCS coding-standard violations / Автоматически исправить нарушения стандартов Yii2 через PHPCBF'
+	@printf '%s\n' '  make phpstan-check                     Run PHPStan analysis / Запустить анализ PHPStan'
+	@printf '%s\n' '  make cs-check                          Check PHP style with PHP CS Fixer / Проверить стиль PHP через PHP CS Fixer'
+	@printf '%s\n' '  make cs-fix                            Fix PHP style with PHP CS Fixer / Исправить стиль PHP через PHP CS Fixer'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Destructive maintenance / Деструктивные операции:'
 	@printf '%s\n' '  make mysql-reinit CONFIRM=mysql-data   Recreate MySQL volume and dev/test schemas / Пересоздать MySQL volume и dev/test схемы'
@@ -158,14 +170,25 @@ migrate: check-env
 demo-data: check-env
 	@$(COMPOSE) exec --user app php ./yii demo-data/fill
 
-test-db-init: check-env
-	@test -n "$(MYSQL_TEST_DATABASE)" || (echo 'MYSQL_TEST_DATABASE must be set in .env.docker.' >&2; exit 1)
-	@$(COMPOSE) exec -e MYSQL_TEST_DATABASE=$(MYSQL_TEST_DATABASE) mysql sh -lc 'mysql -uroot -p"$$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS \`$$MYSQL_TEST_DATABASE\`; GRANT ALL PRIVILEGES ON \`$$MYSQL_TEST_DATABASE\`.* TO '\''$$MYSQL_USER'\''@'\''%'\''; FLUSH PRIVILEGES;"'
+test-db-guard: check-env
+	@test_database="$$($(TEST_DB_PREFLIGHT))" && $(TEST_DB_MYSQL) '$(TEST_DB_SERVICE_GUARD)'
 
-test-db-migrate: check-env
-	@$(COMPOSE) exec --user app \
-		-e MYSQL_DATABASE=$(MYSQL_TEST_DATABASE) \
-		php ./yii migrate --interactive=0
+test-db-init: check-env
+	@test_database="$$($(TEST_DB_PREFLIGHT))" && \
+		$(TEST_DB_MYSQL) '$(TEST_DB_SERVICE_GUARD); \
+		if [[ ! "$$MYSQL_USER" =~ ^[a-zA-Z0-9_-]+$$ ]]; then \
+			echo "MYSQL_USER must be a safe MySQL account name." >&2; exit 1; \
+		fi; \
+		partial_revokes="$$(mysql -uroot -p"$$MYSQL_ROOT_PASSWORD" -Nse "SELECT @@GLOBAL.partial_revokes")"; \
+		case "$$partial_revokes" in \
+			0) grant_database="$${MYSQL_TEST_DATABASE//_/\\_}" ;; \
+			1) grant_database="$$MYSQL_TEST_DATABASE" ;; \
+			*) echo "Could not determine MySQL database grant syntax." >&2; exit 1 ;; \
+		esac; \
+		mysql -uroot -p"$$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS \`$$MYSQL_TEST_DATABASE\`; GRANT ALL PRIVILEGES ON \`$$grant_database\`.* TO '\''$$MYSQL_USER'\''@'\''%'\''; FLUSH PRIVILEGES;"'
+
+test-db-migrate: test-db-guard
+	@$(TEST_PHP) php php -r 'define("YII_ENV", "test"); $$_SERVER["SCRIPT_FILENAME"] = __DIR__ . "/yii"; require $$_SERVER["SCRIPT_FILENAME"];' -- migrate --interactive=0
 
 mysql-reinit: check-env
 	@test "$(CONFIRM)" = "mysql-data" || (echo 'Usage: make mysql-reinit CONFIRM=mysql-data' >&2; exit 1)
@@ -178,32 +201,36 @@ mysql-reinit: check-env
 	@$(MAKE) test-db-init
 	@$(MAKE) test-db-migrate
 
-test: check-env
-	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist
+test: test-db-guard
+	@$(TEST_PHP) php composer test
 
-test-dox: check-env
-	@$(COMPOSE) exec --user app php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --testdox
+test-dox: test-db-guard
+	@$(TEST_PHP) php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --testdox
 
-coverage: check-env
-	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-clover runtime/coverage.xml --coverage-text --show-uncovered-for-coverage-text
+coverage: test-db-guard
+	@XDEBUG_MODE=coverage $(TEST_PHP) -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-clover runtime/coverage.xml --coverage-text --show-uncovered-for-coverage-text
 
-coverage-html: check-env
+coverage-html: test-db-guard
 	@$(COMPOSE) exec --user app php rm -rf runtime/coverage
-	@XDEBUG_MODE=coverage $(COMPOSE) exec --user app -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-html runtime/coverage
+	@XDEBUG_MODE=coverage $(TEST_PHP) -e XDEBUG_MODE php ./vendor/bin/phpunit --configuration=phpunit.xml.dist --coverage-html runtime/coverage
 
 composer-validate: check-env
-	@$(COMPOSE) exec --user app php composer validate
+	@$(COMPOSE) exec --user app php composer validate --strict --no-check-publish
+
+composer-audit: check-env
+	@$(COMPOSE) exec --user app php composer audit --locked
 
 php-lint: check-env
-	@$(COMPOSE) exec --user app php bash -lc 'find assets commands config controllers integrations migrations models services tests views web widgets -type f -name "*.php" -print0 | xargs -0 -n1 php -l; php -l yii'
+	@$(COMPOSE) exec --user app php composer lint
 
 phpstan-check: check-env
-	@$(COMPOSE) exec --user app php ./vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=-1
+	@$(COMPOSE) exec --user app php composer analyse
 
-phpcs-check: check-env
-	@$(COMPOSE) exec --user app php ./vendor/bin/phpcs --standard=phpcs.xml.dist
+cs-check: check-env
+	@$(COMPOSE) exec --user app php composer cs:check
 
-phpcs-fix: check-env
-	@$(COMPOSE) exec --user app php ./vendor/bin/phpcbf --standard=phpcs.xml.dist
+cs-fix: check-env
+	@$(COMPOSE) exec --user app php composer cs:fix
 
-check: composer-validate php-lint phpstan-check phpcs-check
+check:
+	@$(MAKE) -j1 composer-validate composer-audit php-lint cs-check phpstan-check test

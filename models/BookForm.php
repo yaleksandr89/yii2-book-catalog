@@ -99,7 +99,7 @@ final class BookForm extends Model
             'description' => $book->description,
             'isbn' => $book->isbn,
             'authorIds' => array_map(
-                static fn (Author $author): int => $author->id,
+                static fn(Author $author): int => $author->id,
                 $book->authors,
             ),
         ]);
@@ -127,7 +127,7 @@ final class BookForm extends Model
         }
 
         $normalized = array_map(
-            static fn (mixed $authorId): mixed => is_string($authorId) ? trim($authorId) : $authorId,
+            static fn(mixed $authorId): mixed => is_string($authorId) ? trim($authorId) : $authorId,
             $value,
         );
 
@@ -137,7 +137,7 @@ final class BookForm extends Model
     public function validateAuthorIds(string $attribute): void
     {
         $authorIds = array_values(
-            array_unique($this->getNormalizedAuthorIds())
+            array_unique($this->getNormalizedAuthorIds()),
         );
         $existingCount = (int) Author::find()->where(['id' => $authorIds])->count();
         if ($existingCount !== count($authorIds)) {

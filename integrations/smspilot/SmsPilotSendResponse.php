@@ -12,8 +12,7 @@ final readonly class SmsPilotSendResponse
         public string $serverId,
         public string $phone,
         public int $status,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $data

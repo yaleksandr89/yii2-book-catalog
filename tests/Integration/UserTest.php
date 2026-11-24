@@ -8,7 +8,6 @@ use app\models\LoginForm;
 use app\models\User;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 
 final class UserTest extends TestCase
 {
@@ -31,7 +30,7 @@ final class UserTest extends TestCase
         ]);
 
         self::assertTrue($form->login());
-        self::assertSame($user->id, Yii::$app->user->id);
+        self::assertSame($user->id, $this->app->user->id);
     }
 
     #[TestDox('Неверные учетные данные отклоняются')]
@@ -56,7 +55,7 @@ final class UserTest extends TestCase
         ]);
 
         self::assertFalse($form->login());
-        self::assertTrue(Yii::$app->user->isGuest);
+        self::assertTrue($this->app->user->isGuest);
         self::assertSame(['Неверное имя пользователя или пароль.'], $form->getErrors('password'));
     }
 
@@ -83,8 +82,8 @@ final class UserTest extends TestCase
     {
         $user = new User([
             'username' => $username,
-            'password_hash' => Yii::$app->security->generatePasswordHash($password),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $this->app->security->generatePasswordHash($password),
+            'auth_key' => $this->app->security->generateRandomString(),
         ]);
         self::assertTrue($user->save());
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /** @var yii\web\View $this */
 
 $this->title = 'Техническое задание — Yii2 Book Catalog';

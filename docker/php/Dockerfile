@@ -1,6 +1,6 @@
 FROM composer:2 AS composer
 
-FROM php:8.4-fpm
+FROM php:8.5-fpm
 
 ARG APP_UID=1000
 ARG APP_GID=1000

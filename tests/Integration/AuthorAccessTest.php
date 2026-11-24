@@ -8,7 +8,6 @@ use app\models\Author;
 use app\models\User;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
-use Yii;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -31,12 +30,14 @@ final class AuthorAccessTest extends TestCase
         }
 
         $firstPage = $this->app->runAction('author/index');
+        self::assertIsString($firstPage);
 
         self::assertSame(10, substr_count($firstPage, 'class="list-group-item list-group-item-action"'));
         self::assertStringNotContainsString('Автор 11', $firstPage);
 
         $this->app->request->setQueryParams(['page' => 2]);
         $secondPage = $this->app->runAction('author/index');
+        self::assertIsString($secondPage);
 
         self::assertStringContainsString('Автор 11', $secondPage);
     }
@@ -142,10 +143,10 @@ final class AuthorAccessTest extends TestCase
     {
         $user = new User([
             'username' => 'editor',
-            'password_hash' => Yii::$app->security->generatePasswordHash('password'),
-            'auth_key' => Yii::$app->security->generateRandomString(),
+            'password_hash' => $this->app->security->generatePasswordHash('password'),
+            'auth_key' => $this->app->security->generateRandomString(),
         ]);
         self::assertTrue($user->save());
-        self::assertTrue(Yii::$app->user->login($user));
+        self::assertTrue($this->app->user->login($user));
     }
 }

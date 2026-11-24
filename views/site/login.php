@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
 
@@ -21,7 +23,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
     <div class="card border-0 overflow-hidden login-split-card">
         <div class="row g-0">
 
-            <!-- Brand panel -->
+            <!-- RU: Панель бренда. EN: Brand panel. -->
             <div class="col-md-5 d-none d-md-flex login-brand-panel text-white">
                 <div class="d-flex flex-column justify-content-between p-4 p-lg-5 w-100">
                     <div>
@@ -45,11 +47,11 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                 </div>
             </div>
 
-            <!-- Form panel -->
+            <!-- RU: Панель формы. EN: Form panel. -->
             <div class="col-md-7">
                 <div class="p-4 p-lg-5">
                     <div class="text-center mb-4">
-                        <!-- Mobile-only logo -->
+                        <!-- RU: Логотип только для мобильной версии. EN: Mobile-only logo. -->
                         <div class="d-md-none mb-3">
                             <?= Html::img(
                                 Yii::getAlias('@web/images/yii3_full_black_for_light.svg'),

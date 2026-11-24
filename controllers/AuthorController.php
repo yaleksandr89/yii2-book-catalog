@@ -63,7 +63,8 @@ final class AuthorController extends Controller
     {
         $model = new Author();
 
-        if ($model->load($this->request->post()) && $model->save()) {
+        $post = $this->request->post();
+        if (is_array($post) && $model->load($post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -78,7 +79,8 @@ final class AuthorController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load($this->request->post()) && $model->save()) {
+        $post = $this->request->post();
+        if (is_array($post) && $model->load($post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
